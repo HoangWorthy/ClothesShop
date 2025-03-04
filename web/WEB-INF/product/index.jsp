@@ -11,20 +11,20 @@
 <div id="carouselExample" class="carousel slide">
     <div class="carousel-inner">
         <div class="carousel-item active">
-            <img src="<c:url value="/advertise/1.jpg" />" class="d-block w-100 h-100">
+            <img src="<c:url value="/pics/advertise/1.jpg" />" class="d-block w-100 h-100">
             <div class="carousel-caption d-none d-md-block">
                 <a class="btn btn-dark btn-lg" href="<c:url value="/product/list.do"/>" role="button">Explore Now</a>
             </div>
 
         </div>
         <div class="carousel-item">
-            <img src="<c:url value="/advertise/2.jpg" />" class="d-block w-100 h-100">
+            <img src="<c:url value="/pics/advertise/2.jpg" />" class="d-block w-100 h-100">
             <div class="carousel-caption d-none d-md-block">
                 <a class="btn btn-dark btn-lg" href="<c:url value="/product/list.do"/>" role="button">Explore Now</a>
             </div>
         </div>
         <div class="carousel-item">
-            <img src="<c:url value="/advertise/3.jpg" />" class="d-block w-100 h-100">
+            <img src="<c:url value="/pics/advertise/3.jpg" />" class="d-block w-100 h-100">
             <div class="carousel-caption d-none d-md-block">
                 <a class="btn btn-dark btn-lg" href="<c:url value="/product/list.do"/>" role="button">Explore Now</a>
             </div>
@@ -47,9 +47,9 @@
         </div>
         <div class="row row-cols-md-4">
             <c:forEach var="product" items="${top}">
-                <div class="col my-3 ">
+                <div class="col my-3">
                     <div class="card border border-secondary border-4" style="width: 18rem;">
-                        <img src="<c:url value="/products/${product.id}.jpg" />" width="286px" height="382px"  class="card-img-top">
+                        <img src="<c:url value="/pics/products/${product.id}.jpg" />" width="286px" height="382px"  class="card-img-top">
                         <div class="card-body">
                             <h5 class="card-title fw-semibold">${product.description}</h5>
                             <h6 class="card-title text-danger fw-semibold"><fmt:formatNumber value="${product.newPrice}" type="currency" /> | <fmt:formatNumber value="-${product.discount}" type="percent" /></h6>

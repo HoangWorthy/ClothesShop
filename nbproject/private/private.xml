@@ -4,9 +4,11 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/web/WEB-INF/product/index.jsp</file>
+            <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/src/java/db/Product.java</file>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/web/index.jsp</file>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/src/java/controllers/CartController.java</file>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/src/java/db/ProductFacade.java</file>
+            <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/src/java/db/DBContext.java</file>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/src/java/controllers/ProductController.java</file>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/web/WEB-INF/layouts/main.jsp</file>
             <file>file:/D:/Semesters/Spring2025/PRJ301/Assignment/Project/ClothesShop/src/java/controllers/Config.java</file>

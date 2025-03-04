@@ -43,7 +43,7 @@ public class ProductController extends HttpServlet {
                 list(request, response);
                 break;
             case "index":
-                list(request, response);
+                index(request, response);
                 break;
         }
     }
@@ -78,6 +78,7 @@ public class ProductController extends HttpServlet {
 
             ProductFacade pf = new ProductFacade();
             List<Product> top = pf.selectTop8();
+            System.out.println(top);
             request.setAttribute("top", top);
             request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
         } catch (SQLException ex) {
