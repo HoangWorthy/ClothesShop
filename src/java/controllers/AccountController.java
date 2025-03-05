@@ -1,14 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controllers;
 
-import cart.Cart;
-import cart.CartDAO;
-import product.Product;
-import product.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -16,15 +11,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
- * @author PHT
+ * @author PC
  */
-@WebServlet(name = "CartController", urlPatterns = {"/cart"})
-public class CartController extends HttpServlet {
-    CartDAO cartDAO = new CartDAO();
+@WebServlet(name = "AccountController", urlPatterns = {"/account"})
+public class AccountController extends HttpServlet {
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -37,49 +31,18 @@ public class CartController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String action = (String) request.getAttribute("action");
-        try{
-            switch (action) {
-                case "index":
-                    //thêm item vào cart
-                    index(request, response);
-                    break;
-                case "add":
-                    //thêm item vào cart
-                    add(request, response);
-                    break;
-                case "remove":
-                    //xóa item khỏi cart
-                    remove(request, response);
-                    break;
-                case "empty":
-                    //xóa sạch cart
-                    empty(request, response);
-                    break;
-            }
-        }catch(Exception e){}
-    }
-
-    protected void add(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String productId = request.getParameter("productId");
-        
-    }
-
-    protected void index(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
-    }
-
-    protected void empty(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-       
-    }
-    
-    protected void remove(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet AccountController</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet AccountController at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

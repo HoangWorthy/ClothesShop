@@ -5,8 +5,8 @@
  */
 package controllers;
 
-import db.Product;
-import db.ProductFacade;
+import product.Product;
+import product.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -57,7 +57,7 @@ public class ProductController extends HttpServlet {
             int page = spage==null?1:Integer.parseInt(spage);
             request.setAttribute("page", page);
             //Đọc table Toy
-            ProductFacade pf = new ProductFacade();
+            ProductDAO pf = new ProductDAO();
             int row_count = pf.count();
             List<Product> list = pf.selectlist(page);
             //Tính total_pages
@@ -76,7 +76,7 @@ public class ProductController extends HttpServlet {
             throws ServletException, IOException {
         try {
 
-            ProductFacade pf = new ProductFacade();
+            ProductDAO pf = new ProductDAO();
             List<Product> top = pf.selectTop8();
             System.out.println(top);
             request.setAttribute("top", top);

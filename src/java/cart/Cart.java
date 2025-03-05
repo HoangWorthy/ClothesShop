@@ -14,41 +14,36 @@ import java.util.Map;
  * @author PHT
  */
 public class Cart {
-    private Map<Integer,Item> map;
+    private int id;
+    private int quantity;
+    private int productId;
+    private int accountId;
 
     public Cart() {
-        this.map = new HashMap<>();
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
     
-    public void add(Item item){
-        int id = item.getId();
-        if(this.map.keySet().contains(id)){
-            //nếu trong map đã có item thì tăng quantity
-            Item currentItem = this.map.get(id);
-            currentItem.setQuantity(currentItem.getQuantity()+item.getQuantity());
-        }else{
-            //nếu trong map chưa có item thì thêm item vào map
-            this.map.put(id, item);
-        }
-    }
-    
-    public Collection<Item> getItems(){
-        return this.map.values();
-    }
-    
-    public double getTotal(){
-        double total = 0;
-        for(Item item:this.map.values()){
-            total += item.getCost();
-        }
-        return total;
-    }
-    
-    public void empty(){
-        this.map.clear();
-    }
-    
-    public void remove(int id){
-        this.map.remove(id);
-    }
 }

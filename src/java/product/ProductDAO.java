@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package db;
+package product;
 
+import db.DBContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +18,7 @@ import java.util.List;
  *
  * @author PHT
  */
-public class ProductFacade {
+public class ProductDAO {
     
     public List<Product> select() throws SQLException{
         List<Product> list = null;
