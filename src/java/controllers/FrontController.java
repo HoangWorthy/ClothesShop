@@ -45,14 +45,6 @@ public class FrontController extends HttpServlet {
         //lưu controller & action vào request
         request.setAttribute("controller", controller);
         request.setAttribute("action", action);
-        //lấy cart từ session
-        HttpSession session = request.getSession();
-        Cart cart = (Cart) session.getAttribute("cart");
-        if (cart == null) {
-            //nếu trong session chưa có cart thì tạo cart mới
-            cart = new Cart();
-            session.setAttribute("cart", cart);
-        }
         //chuyển request & response cho controller tương ứng
         request.getRequestDispatcher(controller).forward(request, response);
     }

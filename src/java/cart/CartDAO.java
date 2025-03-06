@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -48,8 +47,8 @@ public class CartDAO {
         return 0;
     }
     
-    public List<Cart> searchByAccount(int accountId) throws SQLException{
-        List<Cart> carts = new ArrayList();
+    public ArrayList<Cart> searchByAccount(int accountId) throws SQLException{
+        ArrayList<Cart> carts = new ArrayList();
         Connection conn = DBContext.getConnection();
         PreparedStatement pst = conn.prepareStatement("select * from Carts accountId=?");
         pst.setInt(1, accountId);
@@ -63,5 +62,21 @@ public class CartDAO {
         }
         conn.close();
         return carts;
+    }
+    
+    public void emptyAll(int accountId) throws SQLException{
+        Connection conn = DBContext.getConnection();
+        PreparedStatement pst = conn.prepareStatement("delete * from carts where accountId=?");
+        pst.setInt(1, accountId);
+        pst.executeUpdate();
+        conn.close();
+    }
+    public void remove(int accountId, int productId) throws SQLException{
+        Connection conn = DBContext.getConnection();
+        PreparedStatement pst = conn.prepareStatement("delete * from carts where accountId=? and productId=?");
+        pst.setInt(1, accountId);
+        pst.setInt(2, productId);
+        pst.executeUpdate();
+        conn.close();
     }
 }

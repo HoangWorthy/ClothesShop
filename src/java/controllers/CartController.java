@@ -5,12 +5,15 @@
  */
 package controllers;
 
+import account.Account;
 import cart.Cart;
 import cart.CartDAO;
 import product.Product;
 import product.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -61,25 +64,43 @@ public class CartController extends HttpServlet {
     }
 
     protected void add(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
         String productId = request.getParameter("productId");
-        
+        Account account = (Account) session.getAttribute("account");
+        int accountId = account.getId();
+        cartDAO.create(Integer.parseInt(productId), accountId);
+        index(request,response);
     }
 
     protected void index(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        int accountId = account.getId();
+        ArrayList<Cart> carts = new ArrayList();
+        carts = cartDAO.searchByAccount(accountId);
+        request.setAttribute("carts", carts);
         request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
     }
 
     protected void empty(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-       
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        int accountId = account.getId();
+        cartDAO.emptyAll(accountId);
+        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
     }
     
     protected void remove(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
+        String productId = request.getParameter("productId");
+        Account account = (Account) session.getAttribute("account");
+        int accountId = account.getId();
+        cartDAO.remove(accountId, Integer.parseInt(productId));
+        index(request,response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -4,13 +4,17 @@
  */
 package controllers;
 
+import account.Account;
+import account.AccountDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -18,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "AccountController", urlPatterns = {"/account"})
 public class AccountController extends HttpServlet {
-
+    AccountDAO accountDAO = new AccountDAO();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -31,18 +35,53 @@ public class AccountController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AccountController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AccountController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        String action = request.getParameter("action");
+        try{
+            switch(action){
+                case "login":
+                    login(request,response);
+                    break;
+                case "register":
+                    register(request,response);
+                    break;
+            }
+        } catch(Exception e){}
+    }
+    protected void login(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        Account account = accountDAO.searchOne(username,password);
+        if(account == null){
+            request.setAttribute("message","Username or password is wrong!");
+            return;
         }
+        HttpSession session = request.getSession();
+        session.setAttribute("account", account);
+        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+    }
+    protected void register(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String roleId = request.getParameter("roleId");
+        String name = request.getParameter("name");
+        String address = request.getParameter("address");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        //Need validation!!
+        Account account = new Account();
+        account.setUsername(username);
+        account.setPassword(password);
+        account.setRoleId(roleId);
+        account.setName(name);
+        account.setAddress(address);
+        account.setEmail(email);
+        account.setPhone(phone);
+        accountDAO.create(account);
+        HttpSession session = request.getSession();
+        session.setAttribute("account", account);
+        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
