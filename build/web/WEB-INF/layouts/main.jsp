@@ -68,8 +68,9 @@
                             </c:if>
                             <c:if test="${account != null}">
                                 Welcome ${account.username} |
+                                <a href="<c:url value="/product/admin.do"/>">Admin Dashboard</a> |
                                 <a class="text-primary-emphasis link-underline link-underline-opacity-0 fs-5 ms-3" href="<c:url value="/cart/index.do" />"><i class="bi bi-cart"></i></a>
-                                </c:if>
+                            </c:if>
                         </div>
                     </div>
                 </div>

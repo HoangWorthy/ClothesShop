@@ -18,9 +18,10 @@
             <div class="row">
                 <div class="col-md-2 fs-5 border-end border-1 pt-4" style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
                     <div class="text-center">
-                    <a href="<c:url value="/product/admin.do"/>" class="text-primary-emphasis link-underline link-underline-opacity-0 fs-5 fw-semibold">Overview</a>
+                        <a href="<c:url value="/product/admin.do"/>" class="text-primary-emphasis link-underline link-underline-opacity-0 fs-5 fw-semibold">Overview</a>
                     </div>
                     <hr/>
+                    <!--1 la nhu nay-->
                     <div class="my-3">
                         <h6 class="fs-5 fw-semibold">Table</h6>
                         <div class="list-group list-group-flush list-group-item-light">
@@ -29,7 +30,7 @@
                             <a href="#" class="list-group-item list-group-item-action">Carts</a>
                         </div>
                     </div>
-                            <div class="my-3">
+                    <div class="my-3">
                         <h6 class="fs-5 fw-semibold">Pages</h6>
                         <div class="list-group list-group-flush list-group-item-light">
                             <a href="<c:url value="/product/index.do" />" class="list-group-item list-group-item-action">User's Index</a>

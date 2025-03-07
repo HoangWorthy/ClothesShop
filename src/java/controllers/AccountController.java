@@ -65,7 +65,7 @@ public class AccountController extends HttpServlet {
         session.setAttribute("account", account);
         if (account.getRoleId() == "AD") {
             System.out.println(account.getRoleId());
-            request.getRequestDispatcher("/admin.jsp").forward(request, response);
+            request.getRequestDispatcher(Config.ADMIN).forward(request, response);
         } else {
             request.getRequestDispatcher("/index.jsp").forward(request, response);
         }
