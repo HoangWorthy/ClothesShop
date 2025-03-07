@@ -8,7 +8,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!--Carousel-->
-<div id="carouselExample" class="carousel slide">
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item active">
             <img src="<c:url value="/pics/advertise/1.jpg" />" class="d-block w-100 h-100">
@@ -30,14 +30,15 @@
             </div>
         </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
     </button>
+
 </div>
 <!--Best Seller-->
 <div class="container text-center mt-4 fw-bold">
@@ -55,7 +56,7 @@
                             <h6 class="card-title text-danger fw-semibold"><fmt:formatNumber value="${product.newPrice}" type="currency" /> | <fmt:formatNumber value="-${product.discount}" type="percent" /></h6>
                             <div class="d-grid gap-2 d-md-flex justify-content-center">
                                 <a href="" class="btn btn-secondary">View</a>
-                                <a href="<c:url value="/cart/add.do?id=${product.id}&quantity=1"/>" class="btn btn-secondary"><i class="bi bi-cart-plus"></i></a>
+                                <a href="<c:url value="/cart/add.do?productId=${product.id}&quantity=1"/>" class="btn btn-secondary"><i class="bi bi-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
@@ -70,12 +71,10 @@
                 <h1 class="best-seller-title">About Us</h1>
             </div>
             <div class="position-relative mx-auto border border-secondary border-4 rounded" style="width: 640px; height: 440px;">
-                <img src="<c:url value='/advertise/AboutUs.jpg' />" class="img-fluid w-100 h-100">
-                <a href="<c:url value='/product/list.do' />" class="btn btn-secondary position-absolute" 
+                <img src="<c:url value='/pics/advertise/AboutUs.jpg' />" class="img-fluid w-100 h-100">
+                <a href="<c:url value='/product/list.do' />" class="btn btn-dark position-absolute" 
                    style="top: 90%; left: 50%; transform: translate(-50%, -50%);">Click Here</a>
             </div>
         </div>
     </div>
-
-
 </div>

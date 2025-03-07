@@ -8,6 +8,7 @@ package cart;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import product.Product;
 
 /**
  *
@@ -17,6 +18,7 @@ public class Cart {
     private int id;
     private int quantity;
     private int productId;
+    private Product product;
     private int accountId;
 
     public Cart() {
@@ -44,6 +46,18 @@ public class Cart {
 
     public void setAccountId(int accountId) {
         this.accountId = accountId;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+    
+    public double getNewTotal() {
+        return product.getNewPrice() * this.quantity;
     }
     
 }

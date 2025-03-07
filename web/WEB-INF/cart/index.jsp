@@ -11,50 +11,78 @@
     <tr>
         <th>No.</th>
         <th>Image</th>
-        <th>Id</th>
         <th>Description</th>
-        <th style="text-align: right;">Old Price</th>
-        <th style="text-align: right;">New Price</th>
-        <th style="text-align: right;">Quantity</th>
-        <th style="text-align: right;">Cost</th>
-        <th>Operations</th>
+        <th class="text-center">Unit Price</th>
+        <th class="text-center">Quantity</th>
+        <th class="text-center">Total Price</th>
+        <th class="text-center">Actions</th>
     </tr>
-    <c:forEach var="item" items="${cart.items}" varStatus="loop" >
+    <c:forEach var="item" items="${carts}" varStatus="loop" >
         <tr>
             <td>${loop.count}</td>
-            <td><img src="<c:url value="/products/${item.id}.jpg" />" height="80px" /></td>
-            <td>${item.id}</td>
+            <td><img src="<c:url value="/pics/products/${item.productId}.jpg" />" height="80px" /></td>
             <td>${item.product.description}</td>
-            <td style="text-align: right;">
-                <fmt:formatNumber value="${item.product.price}" type="currency" />
+
+            <td class="text-center">
+                <span class="text-decoration-line-through"><fmt:formatNumber value="${item.product.price}" type="currency" /></span> | <fmt:formatNumber value="${item.product.newPrice}" type="currency" />
             </td>
-            <td style="text-align: right;">
-                <fmt:formatNumber value="${item.product.newPrice}" type="currency" />
+            <td class="text-center">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <form action="<c:url value='/cart/update.do'/>" method="post" class="d-flex align-items-center">
+                        <input type="hidden" name="productId" value="${item.productId}"/>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="changeQuantity(-1, ${item.productId})">-</button>
+                        <input type="number" min="0" name="quantity" id="quantity_${item.productId}" value="${item.quantity}" style="width:60px;text-align:center;" />
+                        <button type="button" class="btn btn-outline-secondary btn-sm   " onclick="changeQuantity(1, ${item.productId})">+</button>
+                    </form>
+                </div>
             </td>
-            <td style="text-align: right;">
-                <input type="number" name="quantity" id="quantity" value="${item.quantity}" style="width:60px;" />
+            <td class="text-center text-danger">
+                <fmt:formatNumber value="${item.newTotal}" type="currency" />
             </td>
-            <td style="text-align: right;">
-                <fmt:formatNumber value="${item.cost}" type="currency" />
+            <td class="text-center">
+                <a href="<c:url value="/cart/remove.do?productId=${item.productId}"/>">Remove</a>
+                <a href="<c:url value="/cart/empty.do"/>">Empty Cart</a>
             </td>
-            <td>
-                <a href="#" id="lnkUpdate" >Update</a> | 
-                <a href="<c:url value="/cart/remove.do?id=${item.id}" />">Remove</a>
-            </td>
+
         </tr>
     </c:forEach>
-    <tr>
-        <th style="text-align: right;" colspan="7">Total</th>
-        <th style="text-align: right;">
-            <fmt:formatNumber value="${cart.total}" type="currency" />                
-        </th>
-        <th>
-            <a href="<c:url value="/cart/empty.do" />">Empty Cart</a>
-        </th>
-    </tr>
 </table>
+
+
+
+
+
+
+
+
+
+
 <script>
-    $("#lnkUpdate").click(function(){
-        alert($("#quantity").val())
-    })
+    function changeQuantity(x, productId) {
+        const input = document.getElementById('quantity_' + productId);
+        let quantity = parseInt(input.value) + x;
+
+        if (quantity < 0)
+            quantity = 0; // Optional guard, if you don't want negatives
+
+        // Update the hidden form field and submit the form
+        input.value = quantity;
+
+        // Directly submit the form to update in backend
+        const form = input.closest('form');
+        form.submit();
+    }
 </script>
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>

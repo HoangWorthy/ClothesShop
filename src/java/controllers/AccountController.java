@@ -22,10 +22,11 @@ import javax.servlet.http.HttpSession;
  */
 @WebServlet(name = "AccountController", urlPatterns = {"/account"})
 public class AccountController extends HttpServlet {
+
     AccountDAO accountDAO = new AccountDAO();
+
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -36,30 +37,40 @@ public class AccountController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String action = request.getParameter("action");
-        try{
-            switch(action){
+        try {
+            switch (action) {
                 case "login":
-                    login(request,response);
+                    login(request, response);
                     break;
                 case "register":
-                    register(request,response);
+                    register(request, response);
                     break;
             }
-        } catch(Exception e){}
+        } catch (Exception e) {
+        }
     }
+
     protected void login(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        Account account = accountDAO.searchOne(username,password);
-        if(account == null){
-            request.setAttribute("message","Username or password is wrong!");
+        Account account = accountDAO.searchOne(username, password);
+        if (account == null) {
+            request.setAttribute("message", "Username or password is wrong!");
+            request.setAttribute("showLoginModal", true);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
             return;
         }
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
-        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+        if (account.getRoleId() == "AD") {
+            System.out.println(account.getRoleId());
+            request.getRequestDispatcher("/admin.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        }
     }
+
     protected void register(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         String username = request.getParameter("username");
@@ -81,7 +92,8 @@ public class AccountController extends HttpServlet {
         accountDAO.create(account);
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
-        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+        request.setAttribute("showRegisterModal", true);
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

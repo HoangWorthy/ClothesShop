@@ -5,6 +5,7 @@
  */
 package controllers;
 
+import account.Account;
 import product.Product;
 import product.ProductDAO;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -25,8 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ProductController extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -36,7 +37,7 @@ public class ProductController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String action = (String)request.getAttribute("action");
+        String action = (String) request.getAttribute("action");
         switch (action) {
             case "list":
                 //hiện danh sach toy
@@ -45,23 +46,26 @@ public class ProductController extends HttpServlet {
             case "index":
                 index(request, response);
                 break;
+            case "admin":
+                admin(request, response);
+                break;
         }
     }
-    
+
     protected void list(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             int page_size = 15;
             //Lấy số trang
             String spage = request.getParameter("page");
-            int page = spage==null?1:Integer.parseInt(spage);
+            int page = spage == null ? 1 : Integer.parseInt(spage);
             request.setAttribute("page", page);
             //Đọc table Toy
             ProductDAO pf = new ProductDAO();
             int row_count = pf.count();
             List<Product> list = pf.selectlist(page);
             //Tính total_pages
-            int total_page = (int)Math.ceil(row_count/page_size);
+            int total_page = (int) Math.ceil(row_count / page_size);
             request.setAttribute("total_page", total_page);
             //Lưu list vào request
             request.setAttribute("list", list);
@@ -72,17 +76,32 @@ public class ProductController extends HttpServlet {
             ex.printStackTrace();
         }
     }
+
     protected void index(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
 
             ProductDAO pf = new ProductDAO();
             List<Product> top = pf.selectTop8();
-            System.out.println(top);
             request.setAttribute("top", top);
             request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
         } catch (SQLException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    protected void admin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            Account account = (Account) session.getAttribute("account");
+            if (account == null) {
+                response.sendRedirect(request.getContextPath() + "/product/index.do");
+            } else {
+                request.getRequestDispatcher(Config.ADMIN).forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
