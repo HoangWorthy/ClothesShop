@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "AccountController", urlPatterns = {"/account"})
 public class AccountController extends HttpServlet {
 
-    AccountDAO accountDAO = new AccountDAO();
+    private AccountDAO accountDAO = new AccountDAO();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -36,7 +36,8 @@ public class AccountController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String action = request.getParameter("action");
+        String action = (String) request.getAttribute("action");
+        System.out.println(action);
         try {
             switch (action) {
                 case "login":
@@ -53,6 +54,7 @@ public class AccountController extends HttpServlet {
                     break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -88,8 +90,8 @@ public class AccountController extends HttpServlet {
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
         session.invalidate();
-        request.setAttribute("controller", "product");
         request.setAttribute("action", "index");
+        request.setAttribute("controller", "product");
         request.getRequestDispatcher("/product").forward(request, response);
     }
 

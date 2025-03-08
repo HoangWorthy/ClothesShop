@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
  */
 @WebServlet(name = "ProductController", urlPatterns = {"/product"})
 public class ProductController extends HttpServlet {
-
+    private ProductDAO productDAO = new ProductDAO();
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
@@ -38,17 +38,21 @@ public class ProductController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String action = (String) request.getAttribute("action");
-        switch (action) {
-            case "list":
-                //hiện danh sach toy
-                list(request, response);
-                break;
-            case "index":
-                index(request, response);
-                break;
-            case "admin":
-                admin(request, response);
-                break;
+        try{
+            switch (action) {
+                case "list":
+                    //hiện danh sach toy
+                    list(request, response);
+                    break;
+                case "index":
+                    index(request, response);
+                    break;
+                case "adminList":
+                    select(request,response);
+                    break;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -61,9 +65,8 @@ public class ProductController extends HttpServlet {
             int page = spage == null ? 1 : Integer.parseInt(spage);
             request.setAttribute("page", page);
             //Đọc table Toy
-            ProductDAO pf = new ProductDAO();
-            int row_count = pf.count();
-            List<Product> list = pf.selectlist(page);
+            int row_count = productDAO.count();
+            List<Product> list = productDAO.selectlist(page);
             //Tính total_pages
             int total_page = (int) Math.ceil(row_count / page_size);
             request.setAttribute("total_page", total_page);
@@ -80,29 +83,18 @@ public class ProductController extends HttpServlet {
     protected void index(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-
-            ProductDAO pf = new ProductDAO();
-            List<Product> top = pf.selectTop8();
+            List<Product> top = productDAO.selectTop8();
             request.setAttribute("top", top);
             request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
-
-    protected void admin(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            HttpSession session = request.getSession();
-            Account account = (Account) session.getAttribute("account");
-            if (account == null) {
-                response.sendRedirect(request.getContextPath() + "/product/index.do");
-            } else {
-                request.getRequestDispatcher(Config.ADMIN).forward(request, response);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void select(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        List<Product> products = productDAO.select();
+        request.setAttribute("products", products);
+        request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

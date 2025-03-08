@@ -27,7 +27,7 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "CartController", urlPatterns = {"/cart"})
 public class CartController extends HttpServlet {
 
-    CartDAO cartDAO = new CartDAO();
+    private CartDAO cartDAO = new CartDAO();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -75,8 +75,10 @@ public class CartController extends HttpServlet {
         String accountId = account.getUsername();
         ArrayList<Cart> carts = new ArrayList();
         carts = cartDAO.searchByAccount(accountId);
-        request.setAttribute("carts", carts);
         try {
+            request.setAttribute("carts", carts);
+            request.setAttribute("controller","cart");
+            request.setAttribute("action","index");
             request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,7 +104,7 @@ public class CartController extends HttpServlet {
                 System.out.println("add success");
             }
         }
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        index(request,response);
     }
 
     protected void update(HttpServletRequest request, HttpServletResponse response)
