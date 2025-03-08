@@ -45,6 +45,12 @@ public class AccountController extends HttpServlet {
                 case "register":
                     register(request, response);
                     break;
+                case "update":
+                    update(request,response);
+                    break;
+                case "logout":
+                    logout(request,response);
+                    break;
             }
         } catch (Exception e) {
         }
@@ -63,12 +69,28 @@ public class AccountController extends HttpServlet {
         }
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
-        if (account.getRoleId() == "AD") {
-            System.out.println(account.getRoleId());
+        if (account.getRoleId().equals("AD")) {
             request.getRequestDispatcher(Config.ADMIN).forward(request, response);
         } else {
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            request.setAttribute("action","index");
+            request.setAttribute("controller","product");
+            request.getRequestDispatcher("/product").forward(request, response);
         }
+    }
+    protected void update(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        String password = request.getParameter("password");
+        accountDAO.update(account.getUsername(), password);
+    }
+    protected void logout(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
+        session.invalidate();
+        request.setAttribute("controller", "product");
+        request.setAttribute("action", "index");
+        request.getRequestDispatcher("/product").forward(request, response);
     }
 
     protected void register(HttpServletRequest request, HttpServletResponse response)
@@ -93,7 +115,9 @@ public class AccountController extends HttpServlet {
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
         request.setAttribute("showRegisterModal", true);
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        request.setAttribute("controller", "product");
+        request.setAttribute("action", "index");
+        request.getRequestDispatcher("/product").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

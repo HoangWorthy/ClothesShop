@@ -43,7 +43,6 @@
                 <a href="<c:url value="/cart/remove.do?productId=${item.productId}"/>">Remove</a>
                 <a href="<c:url value="/cart/empty.do"/>">Empty Cart</a>
             </td>
-
         </tr>
     </c:forEach>
 </table>

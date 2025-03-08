@@ -9,7 +9,6 @@ package account;
  * @author PC
  */
 public class Account {
-    private int id;
     private String username;
     private String password;
     private String roleId;
@@ -20,14 +19,6 @@ public class Account {
     private String phone;
     
     public Account() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getUsername() {

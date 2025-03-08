@@ -27,7 +27,6 @@ public Account searchOne(String username, String password) throws SQLException {
     ResultSet rs = pst.executeQuery();
     if (rs.next()) {
         account = new Account();
-        account.setId(rs.getInt("id"));
         account.setUsername(rs.getString("username"));
         account.setPassword(rs.getString("password"));
         account.setRoleId(rs.getString("roleId"));
@@ -36,6 +35,8 @@ public Account searchOne(String username, String password) throws SQLException {
         account.setEmail(rs.getString("email"));
         account.setPhone(rs.getString("phone"));
     }
+    rs.close();
+    conn.close();
     return account;
 }
 
@@ -51,7 +52,15 @@ public Account searchOne(String username, String password) throws SQLException {
         pst.setString(6, account.getEmail());
         pst.setString(7, account.getPhone());
         int count = pst.executeUpdate();
+        conn.close();
+    }
 
+    public void update(String username, String password) throws SQLException{
+        Connection conn = DBContext.getConnection();
+        PreparedStatement pst = conn.prepareStatement("update Account set password=? where username=?");
+        pst.setString(1, password);
+        pst.setString(2, username);
+        pst.executeUpdate();
         conn.close();
     }
 }

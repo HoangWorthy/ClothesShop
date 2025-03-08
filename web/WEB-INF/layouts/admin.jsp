@@ -36,9 +36,9 @@
                             <a href="<c:url value="/product/index.do" />" class="list-group-item list-group-item-action">User's Index</a>
                             <a href="<c:url value="/product/list.do" />" class="list-group-item list-group-item-action">Products List</a>
                             <a href="<c:url value="/cart/index.do" />" class="list-group-item list-group-item-action">User's Cart</a>
+                            <a href="<c:url value="/account/logout.do" />" class="list-group-item list-group-item-action">Logout</a>
                         </div>
                     </div>
-
                 </div>
                 <div class="col-md-10">
                     <nav class="navbar navbar-expand-lg fw-semibold border-bottom border-secondary border-4">

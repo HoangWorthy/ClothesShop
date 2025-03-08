@@ -11,7 +11,6 @@ import cart.CartDAO;
 import product.Product;
 import product.ProductDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.servlet.ServletException;
@@ -73,7 +72,7 @@ public class CartController extends HttpServlet {
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        int accountId = account.getId();
+        String accountId = account.getUsername();
         ArrayList<Cart> carts = new ArrayList();
         carts = cartDAO.searchByAccount(accountId);
         request.setAttribute("carts", carts);
@@ -92,7 +91,7 @@ public class CartController extends HttpServlet {
         if (account == null) {
             request.setAttribute("showLoginModal", true);
         } else {
-            int accountId = account.getId();
+            String accountId = account.getUsername();
             if (cartDAO.searchOne(Integer.parseInt(productId), accountId) != 0) {
                 int quantity = cartDAO.searchOne(Integer.parseInt(productId), accountId);
                 int newQuantity = quantity + 1;
@@ -112,7 +111,7 @@ public class CartController extends HttpServlet {
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        int accountId = account.getId();
+        String accountId = account.getUsername();
         cartDAO.update(productId, accountId, quantity);
         response.sendRedirect(request.getContextPath() + "/cart/index.do");
     }
@@ -121,7 +120,7 @@ public class CartController extends HttpServlet {
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        int accountId = account.getId();
+        String accountId = account.getUsername();
         cartDAO.emptyAll(accountId);
         response.sendRedirect(request.getContextPath() + "/cart/index.do");
     }
@@ -131,14 +130,13 @@ public class CartController extends HttpServlet {
         HttpSession session = request.getSession();
         String productId = request.getParameter("productId");
         Account account = (Account) session.getAttribute("account");
-        int accountId = account.getId();
+        String accountId = account.getUsername();
         System.out.println(accountId);
         System.out.println(productId);
         cartDAO.remove(accountId, Integer.parseInt(productId));
         System.out.println("delete success");
         response.sendRedirect(request.getContextPath() + "/cart/index.do");
     }
-
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -177,5 +175,4 @@ public class CartController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

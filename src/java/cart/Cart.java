@@ -19,7 +19,7 @@ public class Cart {
     private int quantity;
     private int productId;
     private Product product;
-    private int accountId;
+    private String accountId;
 
     public Cart() {
     }
@@ -40,11 +40,11 @@ public class Cart {
         this.productId = productId;
     }
 
-    public int getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 

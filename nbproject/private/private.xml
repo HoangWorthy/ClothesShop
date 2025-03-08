@@ -21,6 +21,11 @@
             <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/src/java/account/AccountDAO.java</file>
             <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/src/java/controllers/AccountController.java</file>
             <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/web/WEB-INF/layouts/admin.jsp</file>
+            <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/src/java/controllers/Config.java</file>
+            <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/web/WEB-INF/product/create.jsp</file>
+            <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/web/WEB-INF/product/update.jsp</file>
+            <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/web/WEB-INF/product/delete.jsp</file>
+            <file>file:/C:/Users/PC/Documents/Study/ProjectPRJ/ClothesShop/web/WEB-INF/order/index.jsp</file>
         </group>
     </open-files>
 </project-private>
