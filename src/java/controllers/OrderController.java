@@ -41,6 +41,9 @@ public class OrderController extends HttpServlet {
                 case "list":
                     selectAll(request,response);
                     break;
+                case "create":
+                    create(request,response);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,5 +94,9 @@ public class OrderController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private void create(HttpServletRequest request, HttpServletResponse response) {
+        
+    }
 
 }
