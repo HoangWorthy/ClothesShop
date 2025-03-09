@@ -45,31 +45,27 @@ public class OrderDAO {
     PreparedStatement pstDetail = null;
     ResultSet rs = null;
     int orderId = 0;
-
-    try {
-        pstHeader = conn.prepareStatement("INSERT INTO OrderHeader (date, accountId, status, shipToAddress) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-        pstHeader.setDate(1, new Date(System.currentTimeMillis()));
-        pstHeader.setString(2, account.getUsername());
-        pstHeader.setString(3, "OnGoing");
-        pstHeader.setString(4, account.getAddress());
-        pstHeader.executeUpdate();
-        rs = pstHeader.getGeneratedKeys();
-        if (rs.next()) {
-            orderId = rs.getInt(1);
-        }
-        pstDetail = conn.prepareStatement("INSERT INTO OrderDetail (orderHeaderId, productId, quantity, price, discount) VALUES (?, ?, ?, ?, ?)");
-
-        for (OrderDetail orderDetail : orderDetails) {
-            pstDetail.setInt(1, orderId);
-            pstDetail.setInt(2, orderDetail.getProductId().getId());
-            pstDetail.setInt(3, orderDetail.getQuantity());
-            pstDetail.setDouble(4, orderDetail.getPrice());
-            pstDetail.setDouble(5, orderDetail.getDiscount());
-            pstDetail.executeUpdate();
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
+    pstHeader = conn.prepareStatement("INSERT INTO OrderHeader (date, accountId, status, shipToAddress) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+    pstHeader.setDate(1, new Date(System.currentTimeMillis()));
+    pstHeader.setString(2, account.getUsername());
+    pstHeader.setString(3, "OnGoing");
+    pstHeader.setString(4, account.getAddress());
+    pstHeader.executeUpdate();
+    rs = pstHeader.getGeneratedKeys();
+    if (rs.next()) {
+        orderId = rs.getInt(1);
     }
+    pstDetail = conn.prepareStatement("INSERT INTO OrderDetail (orderHeaderId, productId, quantity, price, discount) VALUES (?, ?, ?, ?, ?)");
+
+    for (OrderDetail orderDetail : orderDetails) {
+        pstDetail.setInt(1, orderId);
+        pstDetail.setInt(2, orderDetail.getProductId().getId());
+        pstDetail.setInt(3, orderDetail.getQuantity());
+        pstDetail.setDouble(4, orderDetail.getPrice());
+        pstDetail.setDouble(5, orderDetail.getDiscount());
+        pstDetail.executeUpdate();
+    }
+    
 }
     public List<Order> selectOrderHeaderByAccountId(String accountId) throws SQLException{
         Connection conn = DBContext.getConnection();
