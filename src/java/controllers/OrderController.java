@@ -7,6 +7,7 @@ package controllers;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import order.Order;
 import order.OrderDAO;
+import order.OrderDetail;
+import product.Product;
 
 /**
  *
@@ -38,7 +41,7 @@ public class OrderController extends HttpServlet {
         String action = (String) request.getAttribute("action");
         try {
             switch (action) {
-                case "list":
+                case "ADMINlist":
                     selectAll(request,response);
                     break;
                 case "create":
@@ -54,6 +57,26 @@ public class OrderController extends HttpServlet {
         List<Order> orders = orderDAO.selectAll();
         request.setAttribute("orders", orders);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
+    }
+    protected void create(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        String[] productId  = request.getParameterValues("id");
+        String[] description = request.getParameterValues("description");
+        String[] quantity = request.getParameterValues("quantity");
+        String[] price = request.getParameterValues("price");
+        String[] discount = request.getParameterValues("discount");
+        ArrayList<OrderDetail> orderDetails = new ArrayList();
+        OrderDetail orderDetail = null;
+        Product product = null;
+        for(int i = 0;i < productId.length;i++){
+            product = new Product();
+            orderDetail = new OrderDetail();
+            product.setId(Integer.parseInt(productId[i]));
+            product.setDescription(description[i]);
+            orderDetail.setProductId(product);
+            
+        }
+        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -94,9 +117,5 @@ public class OrderController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
-    private void create(HttpServletRequest request, HttpServletResponse response) {
-        
-    }
 
 }

@@ -14,8 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import product.Product;
 
 /**
@@ -28,7 +26,7 @@ public class OrderDAO {
         Order order;
         Connection conn = DBContext.getConnection();
         Statement stm = conn.createStatement();
-        ResultSet rs = stm.executeQuery("select * from OrderHeader");
+        ResultSet rs = stm.executeQuery("select * from OrderHeader order by date desc");
         while(rs.next()){
             order = new Order();
             order.setId(rs.getInt("id"));
@@ -41,29 +39,38 @@ public class OrderDAO {
         conn.close();
         return orders;
     }
-    public void create(Account account, OrderDetail orderDetail) throws SQLException{
-        Connection conn = DBContext.getConnection();
-        PreparedStatement pst = conn.prepareStatement("Insert into OrderHeader VALUES(?,?,?,?)");
-        pst.setDate(1, new Date(System.currentTimeMillis()));
-        pst.setString(2,account.getUsername());
-        pst.setString(3, "OnGoing");
-        pst.setString(4, account.getEmail());
-        pst.executeUpdate();
-        pst = conn.prepareStatement("select MAX(id)as MAX_ID from OrderHeader");
-        ResultSet rs = pst.executeQuery();
-        int orderId = 0;
-        if(rs.next()){
-            orderId = rs.getInt("MAX_ID");
+    public void create(Account account, List<OrderDetail> orderDetails) throws SQLException {
+    Connection conn = DBContext.getConnection();
+    PreparedStatement pstHeader = null;
+    PreparedStatement pstDetail = null;
+    ResultSet rs = null;
+    int orderId = 0;
+
+    try {
+        pstHeader = conn.prepareStatement("INSERT INTO OrderHeader (date, accountId, status, shipToAddress) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+        pstHeader.setDate(1, new Date(System.currentTimeMillis()));
+        pstHeader.setString(2, account.getUsername());
+        pstHeader.setString(3, "OnGoing");
+        pstHeader.setString(4, account.getAddress());
+        pstHeader.executeUpdate();
+        rs = pstHeader.getGeneratedKeys();
+        if (rs.next()) {
+            orderId = rs.getInt(1);
         }
-        pst = conn.prepareStatement("Insert into OrderDetail VALUES(?,?,?,?,?)");
-        pst.setInt(1, orderId);
-        pst.setInt(2,orderDetail.getProductId().getId());
-        pst.setInt(3,orderDetail.getQuantity());
-        pst.setDouble(4,orderDetail.getPrice());
-        pst.setDouble(5, orderDetail.getDiscount());
-        pst.executeUpdate();
-        conn.close();
+        pstDetail = conn.prepareStatement("INSERT INTO OrderDetail (orderHeaderId, productId, quantity, price, discount) VALUES (?, ?, ?, ?, ?)");
+
+        for (OrderDetail orderDetail : orderDetails) {
+            pstDetail.setInt(1, orderId);
+            pstDetail.setInt(2, orderDetail.getProductId().getId());
+            pstDetail.setInt(3, orderDetail.getQuantity());
+            pstDetail.setDouble(4, orderDetail.getPrice());
+            pstDetail.setDouble(5, orderDetail.getDiscount());
+            pstDetail.executeUpdate();
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
     public List<Order> selectOrderHeaderByAccountId(String accountId) throws SQLException{
         Connection conn = DBContext.getConnection();
         PreparedStatement pst = conn.prepareStatement("select * from OrderHeader where accountId=?");
