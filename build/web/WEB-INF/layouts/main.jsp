@@ -68,9 +68,11 @@
                             </c:if>
                             <c:if test="${account != null}">
                                 Welcome ${account.username} |
-                                <c:if test="${account.roleId.equals('AD')}"><a href="<c:url value="/product/admin.do"/>">Admin Dashboard</a> |</c:if>
-                                <a class="text-primary-emphasis link-underline link-underline-opacity-0 fs-5 ms-3" href="<c:url value="/cart/index.do" />"><i class="bi bi-cart"></i></a> | 
-                                <a class="text-primary-emphasis link-underline link-underline-opacity-0 fs-5 ms-3" href="<c:url value="/account/logout.do" />">Logout</a>
+                                <c:if test="${account.roleId.equals('AD')}">
+                                    <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/product/adminList.do"/>">Admin Dashboard</a> |
+                                </c:if>
+                                <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3 pe-2" href="<c:url value="/cart/index.do" />"><i class="bi bi-cart"></i></a> | 
+                                <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/account/logout.do" />">Logout</a>
                             </c:if>
                         </div>
                     </div>

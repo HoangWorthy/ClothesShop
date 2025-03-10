@@ -9,7 +9,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import product.Product;
 
 /**
@@ -97,4 +99,70 @@ public class CartDAO {
         pst.executeUpdate();
         conn.close();
     }
+
+    public List<Cart> select() throws SQLException {
+    List<Cart> list = new ArrayList<>();
+    String query = "SELECT c.accountId, c.productId, c.quantity, " +
+                   "p.description, p.price, p.discount, p.categoryId " +
+                   "FROM Carts c JOIN Product p ON c.productId = p.id";
+
+    try (Connection con = DBContext.getConnection();
+         PreparedStatement stm = con.prepareStatement(query);
+         ResultSet rs = stm.executeQuery()) {
+
+        while (rs.next()) {
+            Cart cart = new Cart();
+            cart.setAccountId(rs.getString("accountId"));
+            cart.setProductId(rs.getInt("productId"));
+            cart.setQuantity(rs.getInt("quantity"));
+
+            // Create Product object and set its attributes
+            Product product = new Product();
+            product.setId(rs.getInt("productId"));
+            product.setDescription(rs.getString("description"));
+            product.setPrice(rs.getDouble("price"));
+            product.setDiscount(rs.getDouble("discount"));
+            product.setCategoryId(rs.getInt("categoryId"));
+
+            cart.setProduct(product); // Associate product with cart
+            list.add(cart);
+        }
+    }
+    return list;
+}
+
+
+    public List<Cart> selectTop(int limit) throws SQLException {
+    List<Cart> carts = new ArrayList<>();
+    String query = "SELECT TOP " + limit + " c.accountId, c.productId, c.quantity, " +
+                   "p.description, p.price, p.discount, p.categoryId " +
+                   "FROM Carts c JOIN Product p ON c.productId = p.id " +
+                   "ORDER BY c.accountId";
+
+    try (Connection con = DBContext.getConnection();
+         Statement stm = con.createStatement();
+         ResultSet rs = stm.executeQuery(query)) {
+
+        while (rs.next()) {
+            Cart cart = new Cart();
+            cart.setAccountId(rs.getString("accountId"));
+            cart.setProductId(rs.getInt("productId"));
+            cart.setQuantity(rs.getInt("quantity"));
+
+            // Create Product object and set its attributes
+            Product product = new Product();
+            product.setId(rs.getInt("productId"));
+            product.setDescription(rs.getString("description"));
+            product.setPrice(rs.getDouble("price"));
+            product.setDiscount(rs.getDouble("discount"));
+            product.setCategoryId(rs.getInt("categoryId"));
+
+            cart.setProduct(product); // Associate product with cart
+            carts.add(cart);
+        }
+    }
+    return carts;
+}
+
+
 }

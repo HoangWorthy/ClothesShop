@@ -40,15 +40,17 @@
                 <fmt:formatNumber value="${item.newTotal}" type="currency" />
             </td>
             <td class="text-center">
-                <a href="<c:url value="/cart/remove.do?productId=${item.productId}"/>">Remove</a>
-                <a href="<c:url value="/cart/empty.do"/>">Empty Cart</a>
+                <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/cart/remove.do?productId=${item.productId}"/>">Remove</a>
+                
             </td>
         </tr>
     </c:forEach>
 </table>
 
-
-
+<div class="text-center">
+    <a class="btn btn-dark" href="<c:url value="/cart/empty.do"/>">Empty Cart</a>
+    
+</div>
 
 
 

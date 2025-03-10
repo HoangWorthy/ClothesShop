@@ -72,7 +72,7 @@ public class AccountController extends HttpServlet {
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
         if (account.getRoleId().equals("AD")) {
-            request.getRequestDispatcher(Config.ADMIN).forward(request, response);
+            request.getRequestDispatcher("/product/adminList.do").forward(request, response);
         } else {
             request.setAttribute("action","index");
             request.setAttribute("controller","product");

@@ -74,11 +74,11 @@ public class CartController extends HttpServlet {
         Account account = (Account) session.getAttribute("account");
         String accountId = account.getUsername();
         ArrayList<Cart> carts = new ArrayList();
-        carts = cartDAO.searchByAccount(accountId);
         try {
+        carts = cartDAO.searchByAccount(accountId);
             request.setAttribute("carts", carts);
-            request.setAttribute("controller","cart");
-            request.setAttribute("action","index");
+            request.setAttribute("controller", "cart");
+            request.setAttribute("action", "index");
             request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,7 +104,7 @@ public class CartController extends HttpServlet {
                 System.out.println("add success");
             }
         }
-        index(request,response);
+        index(request, response);
     }
 
     protected void update(HttpServletRequest request, HttpServletResponse response)
@@ -139,6 +139,7 @@ public class CartController extends HttpServlet {
         System.out.println("delete success");
         response.sendRedirect(request.getContextPath() + "/cart/index.do");
     }
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

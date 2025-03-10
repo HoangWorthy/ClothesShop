@@ -46,38 +46,44 @@ public class ProductDAO {
     }
 
     public List<Product> selectlist(int page) throws SQLException {
-        int pageSize = 15;
-        List<Product> list = null;
-        //Tạo kết nối db
-        Connection con = DBContext.getConnection();
-        //Tạo đối tượng Statement
-        PreparedStatement stm = con.prepareStatement("select * from Product order by id offset ? rows fetch next ? rows only");
+    int pageSize = 15;
+    List<Product> list = new ArrayList<>();
+    
+    // Tạo kết nối db
+    Connection con = DBContext.getConnection();
+    String query = "SELECT * FROM Product ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+    
+    try (PreparedStatement stm = con.prepareStatement(query)) {
         stm.setInt(1, (page - 1) * pageSize);
         stm.setInt(2, pageSize);
-        //Thực thi lệnh select
-        ResultSet rs = stm.executeQuery();
-        list = new ArrayList<>();
-        while (rs.next()) {
-            //Đọc từng dòng trong table Brand để vào đối tượng product
-            Product product = new Product();
-            product.setId(rs.getInt("id"));
-            product.setDescription(rs.getString("description"));
-            product.setPrice(rs.getDouble("price"));
-            product.setDiscount(rs.getDouble("discount"));
-            product.setCategoryId(rs.getInt("categoryId"));
-            //Thêm brand vào list
-            list.add(product);
+        
+        try (ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                Product product = new Product();
+                product.setId(rs.getInt("id"));
+                product.setDescription(rs.getString("description"));
+                product.setPrice(rs.getDouble("price"));
+                product.setDiscount(rs.getDouble("discount"));
+                product.setCategoryId(rs.getInt("categoryId"));
+                list.add(product);
+            }
         }
-        //Đóng kết nối db
-        con.close();
-        return list;
+    } finally {
+        con.close(); // Ensure connection is closed
     }
+    
+    return list;
+}
 
-    public List<Product> selectTop8() throws SQLException {
-        List<Product> list = new ArrayList<>();
-        Connection con = DBContext.getConnection();
-        PreparedStatement stm = con.prepareStatement("select top 8 * from Product order by id");
-        ResultSet rs = stm.executeQuery();
+    
+public List<Product> selectTop(int limit) throws SQLException {
+    List<Product> list = new ArrayList<>();
+    String query = "SELECT TOP " + limit + " * FROM Product ORDER BY id"; // Dynamically insert limit
+
+    try (Connection con = DBContext.getConnection();
+         Statement stm = con.createStatement();
+         ResultSet rs = stm.executeQuery(query)) {
+
         while (rs.next()) {
             Product product = new Product();
             product.setId(rs.getInt("id"));
@@ -87,9 +93,10 @@ public class ProductDAO {
             product.setCategoryId(rs.getInt("categoryId"));
             list.add(product);
         }
-        con.close();
-        return list;
     }
+    return list;
+}
+
 
     public Product read(int id) throws SQLException {
         Product product = null;
