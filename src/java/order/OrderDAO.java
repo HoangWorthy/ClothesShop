@@ -65,7 +65,6 @@ public class OrderDAO {
         pstDetail.setDouble(5, orderDetail.getDiscount());
         pstDetail.executeUpdate();
     }
-    
 }
     public List<Order> selectOrderHeaderByAccountId(String accountId) throws SQLException{
         Connection conn = DBContext.getConnection();
@@ -123,5 +122,16 @@ public class OrderDAO {
         }
         conn.close();
         return list;
+    }
+    
+    public void changeStatus(int orderHeaderId, String status) throws SQLException{
+        Connection conn = DBContext.getConnection();
+        PreparedStatement pst = conn.prepareStatement("Update from OrderHeader "
+                + "set status=? where id=?");
+        pst.setString(1, status);
+        pst.setInt(2, orderHeaderId);
+        pst.executeUpdate();
+        pst.close();
+        conn.close();
     }
 }

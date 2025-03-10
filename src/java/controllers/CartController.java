@@ -77,9 +77,9 @@ public class CartController extends HttpServlet {
         try {
         carts = cartDAO.searchByAccount(accountId);
             request.setAttribute("carts", carts);
-            request.setAttribute("controller", "cart");
-            request.setAttribute("action", "index");
-            request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+            request.setAttribute("controller", "order");
+            request.setAttribute("action", "select");
+            request.getRequestDispatcher("/order").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,6 +104,7 @@ public class CartController extends HttpServlet {
                 System.out.println("add success");
             }
         }
+        request.setAttribute("action", "index");
         index(request, response);
     }
 

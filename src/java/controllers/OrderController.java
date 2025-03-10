@@ -4,6 +4,9 @@
  */
 package controllers;
 
+import account.Account;
+import cart.Cart;
+import cart.CartDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -14,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import order.Order;
 import order.OrderDAO;
 import order.OrderDetail;
@@ -47,6 +51,12 @@ public class OrderController extends HttpServlet {
                 case "create":
                     create(request,response);
                     break;
+                case "changeStatus":
+                    changeStatus(request,response);
+                    break;
+                case "select":
+                    select(request,response);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,25 +70,26 @@ public class OrderController extends HttpServlet {
     }
     protected void create(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
-        String[] productId  = request.getParameterValues("id");
-        String[] description = request.getParameterValues("description");
-        String[] quantity = request.getParameterValues("quantity");
-        String[] price = request.getParameterValues("price");
-        String[] discount = request.getParameterValues("discount");
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        CartDAO cartDAO = new CartDAO();
+        ArrayList<Cart> carts = cartDAO.searchByAccount(account.getUsername());
         ArrayList<OrderDetail> orderDetails = new ArrayList();
-        OrderDetail orderDetail = null;
-        Product product = null;
-        for(int i = 0;i < productId.length;i++){
-            product = new Product();
-            orderDetail = new OrderDetail();
-            product.setId(Integer.parseInt(productId[i]));
-            product.setDescription(description[i]);
-            orderDetail.setProductId(product);
-            
+        for(Cart cart : carts){
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setProductId(cart.getProduct());
+            orderDetail.setQuantity(cart.getQuantity());
+            orderDetail.setDiscount(cart.getProduct().getDiscount());
+            orderDetail.setPrice(cart.getProduct().getPrice());
+            orderDetails.add(orderDetail);
         }
-        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+        orderDAO.create(account, orderDetails);
+        cartDAO.emptyAll(account.getUsername());
+        request.setAttribute("action", "ADMINlist");
+        selectAll(request, response);
     }
-
+        
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -118,4 +129,21 @@ public class OrderController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private void changeStatus(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        String status = request.getParameter("status");
+        int orderHeaderId = Integer.parseInt(request.getParameter("id"));
+        orderDAO.changeStatus(orderHeaderId, status);
+        request.setAttribute("action", "ADMINlist");
+        selectAll(request, response);
+    }
+
+    private void select(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        HttpSession session = request.getSession();
+        Account account = new Account();
+        List<List<OrderDetail>> list = orderDAO.selectOrderDetail(account.getUsername());
+        request.setAttribute("list", list);
+        request.setAttribute("controller", "cart");
+        request.setAttribute("action", "index");
+        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+    }
 }
