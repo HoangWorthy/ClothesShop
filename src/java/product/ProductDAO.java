@@ -148,4 +148,40 @@ public List<Product> selectTop(int limit) throws SQLException {
         pst.executeUpdate();
         conn.close();
     }
+    
+    public void delete(int productId) throws SQLException {
+    Connection conn = DBContext.getConnection();
+    PreparedStatement pst = conn.prepareStatement("DELETE FROM Product WHERE id=?");
+    pst.setInt(1, productId);
+    pst.executeUpdate();
+    conn.close();
+}
+
+public int insert(Product product) throws SQLException {
+    int generatedId = -1; // Default value
+    String sql = "INSERT INTO Product (description, price, discount, categoryId) VALUES (?, ?, ?, ?)";
+    
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        stmt.setString(1, product.getDescription());
+        stmt.setDouble(2, product.getPrice());
+        stmt.setDouble(3, product.getDiscount());
+        stmt.setInt(4, product.getCategoryId());
+
+        int affectedRows = stmt.executeUpdate();
+        
+        if (affectedRows > 0) {
+            // Get the generated ID
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    generatedId = rs.getInt(1);
+                }
+            }
+        }
+    }
+    return generatedId;
+}
+
+
 }

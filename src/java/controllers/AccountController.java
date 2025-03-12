@@ -47,10 +47,10 @@ public class AccountController extends HttpServlet {
                     register(request, response);
                     break;
                 case "update":
-                    update(request,response);
+                    update(request, response);
                     break;
                 case "logout":
-                    logout(request,response);
+                    logout(request, response);
                     break;
             }
         } catch (Exception e) {
@@ -74,18 +74,38 @@ public class AccountController extends HttpServlet {
         if (account.getRoleId().equals("AD")) {
             request.getRequestDispatcher("/product/adminList.do").forward(request, response);
         } else {
-            request.setAttribute("action","index");
-            request.setAttribute("controller","product");
+            request.setAttribute("action", "index");
+            request.setAttribute("controller", "product");
             request.getRequestDispatcher("/product").forward(request, response);
         }
     }
+
     protected void update(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
         String password = request.getParameter("password");
-        accountDAO.update(account.getUsername(), password);
+        String name = request.getParameter("name");
+        String address = request.getParameter("address");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        Account newAccount = new Account();
+        newAccount.setUsername(account.getUsername());
+        newAccount.setRoleId(account.getRoleId());
+        newAccount.setPassword(password);
+        newAccount.setName(name);
+        newAccount.setAddress(address);
+        newAccount.setEmail(email);
+        newAccount.setPhone(phone);
+        accountDAO.update(account.getUsername(), newAccount);
+        session.setAttribute("account", newAccount);
+        request.setAttribute("message", "Update Success");
+        request.setAttribute("showUpdateModal", true);
+        request.setAttribute("controller", "product");
+        request.setAttribute("action", "index");
+        request.getRequestDispatcher("/product").forward(request, response);
     }
+
     protected void logout(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
@@ -116,7 +136,8 @@ public class AccountController extends HttpServlet {
         accountDAO.create(account);
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
-        request.setAttribute("showRegisterModal", true);
+//        request.setAttribute("message", "Register Success");
+//        request.setAttribute("showRegisterModal", true);
         request.setAttribute("controller", "product");
         request.setAttribute("action", "index");
         request.getRequestDispatcher("/product").forward(request, response);

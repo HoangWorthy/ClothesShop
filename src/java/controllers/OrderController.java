@@ -29,10 +29,11 @@ import product.Product;
  */
 @WebServlet(name = "OrderController", urlPatterns = {"/order"})
 public class OrderController extends HttpServlet {
+
     private OrderDAO orderDAO = new OrderDAO();
+
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -46,28 +47,36 @@ public class OrderController extends HttpServlet {
         try {
             switch (action) {
                 case "ADMINlist":
-                    selectAll(request,response);
+                    selectAll(request, response);
                     break;
                 case "create":
-                    create(request,response);
+                    create(request, response);
                     break;
                 case "changeStatus":
-                    changeStatus(request,response);
+                    changeStatus(request, response);
                     break;
                 case "select":
-                    select(request,response);
+                    select(request, response);
+                    break;
+                case "selectDetail":
+                    selectDetail(request, response);
+                    break;
+                case "selectDetailAdmin":
+                    selectDetailAdmin(request, response);
                     break;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     protected void selectAll(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         List<Order> orders = orderDAO.selectAll();
         request.setAttribute("orders", orders);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
+
     protected void create(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
@@ -75,7 +84,7 @@ public class OrderController extends HttpServlet {
         CartDAO cartDAO = new CartDAO();
         ArrayList<Cart> carts = cartDAO.searchByAccount(account.getUsername());
         ArrayList<OrderDetail> orderDetails = new ArrayList();
-        for(Cart cart : carts){
+        for (Cart cart : carts) {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setProductId(cart.getProduct());
             orderDetail.setQuantity(cart.getQuantity());
@@ -85,11 +94,12 @@ public class OrderController extends HttpServlet {
         }
         orderDAO.create(account, orderDetails);
         cartDAO.emptyAll(account.getUsername());
-        request.setAttribute("action", "ADMINlist");
-        selectAll(request, response);
+//        request.setAttribute("action", "ADMINlist");
+//        selectAll(request, response);
+        request.getRequestDispatcher("/cart/index.do").forward(request, response);
+
     }
-        
-    
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -129,21 +139,77 @@ public class OrderController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private void changeStatus(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        String status = request.getParameter("status");
-        int orderHeaderId = Integer.parseInt(request.getParameter("id"));
-        orderDAO.changeStatus(orderHeaderId, status);
-        request.setAttribute("action", "ADMINlist");
-        selectAll(request, response);
+    private void changeStatus(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        try {
+            String status = request.getParameter("status");
+            int orderHeaderId = Integer.parseInt(request.getParameter("id"));
+
+            // Call the DAO method to update the status
+            orderDAO.changeStatus(orderHeaderId, status);
+
+            // Redirect to the order admin list after updating
+            response.sendRedirect(request.getContextPath() + "/order/ADMINlist.do");
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            response.getWriter().write("Invalid order ID");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.getWriter().write("Database error while updating order status");
+        }
     }
 
     private void select(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         HttpSession session = request.getSession();
-        Account account = new Account();
-        List<List<OrderDetail>> list = orderDAO.selectOrderDetail(account.getUsername());
+        Account account = (Account) session.getAttribute("account");
+//        Account account = new Account();
+        List<Order> orders = orderDAO.selectOrderHeaderByAccountId(account.getUsername());
+//        List<List<OrderDetail>> list = orderDAO.selectOrderDetail(account.getUsername());
+        request.setAttribute("orders", orders);
+//        request.setAttribute("list", list);
+        request.setAttribute("controller", "cart");
+        request.setAttribute("action", "index");
+        try {
+            request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void selectDetail(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        int orderHeaderId = Integer.parseInt(request.getParameter("orderHeaderId"));
+        List<OrderDetail> list = orderDAO.selectOrderDetailByOrderId(orderHeaderId);
+        for (OrderDetail orderDetail : list) {
+            System.out.println(orderDetail.getNewTotal());
+        }
         request.setAttribute("list", list);
         request.setAttribute("controller", "cart");
         request.setAttribute("action", "index");
-        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+        System.out.println("hleoo");
+        try {
+            request.getRequestDispatcher("/cart/index.do").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void selectDetailAdmin(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        int orderHeaderId = Integer.parseInt(request.getParameter("orderHeaderId"));
+        List<OrderDetail> list = orderDAO.selectOrderDetailByOrderId(orderHeaderId);
+        for (OrderDetail orderDetail : list) {
+            System.out.println(orderDetail.getNewTotal());
+        }
+        request.setAttribute("list", list);
+        System.out.println("hleoo");
+        try {
+            request.getRequestDispatcher("/order/ADMINlist.do").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

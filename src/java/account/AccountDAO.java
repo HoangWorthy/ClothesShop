@@ -49,7 +49,7 @@ public class AccountDAO {
         PreparedStatement pst = conn.prepareStatement("insert into Account VALUES(?,?,?,?,?,?,?)");
         pst.setString(1, account.getUsername());
         pst.setString(2, account.getPassword());
-        pst.setString(3, "AD");
+        pst.setString(3, "US");
         pst.setString(4, account.getName());
         pst.setString(5, account.getAddress());
         pst.setString(6, account.getEmail());
@@ -58,14 +58,32 @@ public class AccountDAO {
         conn.close();
     }
 
-    public void update(String username, String password) throws SQLException {
-        Connection conn = DBContext.getConnection();
-        PreparedStatement pst = conn.prepareStatement("update Account set password=? where username=?");
-        pst.setString(1, password);
-        pst.setString(2, username);
+    public void update(String username, Account newAccount) throws SQLException {
+    Connection conn = null;
+    PreparedStatement pst = null;
+    
+    try {
+        conn = DBContext.getConnection();
+        pst = conn.prepareStatement("UPDATE Account SET password=?, name=?, address=?, email=?, phone=? WHERE username=?");
+        
+        pst.setString(1, newAccount.getPassword());
+        pst.setString(2, newAccount.getName());
+        pst.setString(3, newAccount.getAddress());
+        pst.setString(4, newAccount.getEmail());
+        pst.setString(5, newAccount.getPhone());
+        pst.setString(6, username);
+
         pst.executeUpdate();
-        conn.close();
+    } finally {
+        if (pst != null) {
+            pst.close();
+        }
+        if (conn != null) {
+            conn.close();
+        }
     }
+}
+
 
     public int count() throws SQLException {
         int row_count = 0;

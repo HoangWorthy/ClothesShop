@@ -27,7 +27,7 @@
                         <div class="list-group list-group-flush list-group-item-light">
                             <a href="<c:url value="/product/userList.do" />" class="list-group-item list-group-item-action">Users</a>
                             <a href="<c:url value="/product/productList.do" />" class="list-group-item list-group-item-action">Products</a>
-                            <a href="<c:url value="/product/cartList.do" />" class="list-group-item list-group-item-action">Carts</a>
+                            <a href="<c:url value="/order/ADMINlist.do" />" class="list-group-item list-group-item-action">Orders</a>
                         </div>
                     </div>
                     <div class="my-3">

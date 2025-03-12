@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
  * @author PHT
  */
 @WebServlet(name = "ProductController", urlPatterns = {"/product"})
+
 public class ProductController extends HttpServlet {
 
     private ProductDAO productDAO = new ProductDAO();
@@ -54,6 +55,15 @@ public class ProductController extends HttpServlet {
                 case "index":
                     index(request, response);
                     break;
+                case "update":
+                    update(request, response);
+                    break;
+                case "delete":
+                    delete(request, response);
+                    break;
+                case "add":
+                    add(request, response);
+                    break;
                 case "adminList":
                     select(request, response);
                     break;
@@ -63,9 +73,6 @@ public class ProductController extends HttpServlet {
                 case "productList":
                     selectProduct(request, response);
                     break;
-                case "cartList":
-                    selectCart(request, response);
-                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,42 +80,41 @@ public class ProductController extends HttpServlet {
     }
 
     protected void list(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    try {
-        int page_size = 15;
+            throws ServletException, IOException {
+        try {
+            int page_size = 15;
 
-        // Lấy số trang
-        String spage = request.getParameter("page");
-        int page = (spage == null) ? 1 : Integer.parseInt(spage);
+            // Lấy số trang
+            String spage = request.getParameter("page");
+            int page = (spage == null) ? 1 : Integer.parseInt(spage);
 
-        // Đọc table Product (previously named "Toy" in your comment)
-        int row_count = productDAO.count();
+            // Đọc table Product (previously named "Toy" in your comment)
+            int row_count = productDAO.count();
 
-        // Tính total_pages correctly
-        int total_page = (int) Math.ceil((double) row_count / page_size);
+            // Tính total_pages correctly
+            int total_page = (int) Math.ceil((double) row_count / page_size);
 
-        // Ensure page is within bounds
-        if (page > total_page) {
-            page = total_page; // If the page is out of range, go to the last page
+            // Ensure page is within bounds
+            if (page > total_page) {
+                page = total_page; // If the page is out of range, go to the last page
+            }
+            if (page < 1) {
+                page = 1; // Ensure page does not go below 1
+            }
+
+            // Fetch paginated products
+            List<Product> list = productDAO.selectlist(page);
+
+            request.setAttribute("page", page);
+            request.setAttribute("total_page", total_page);
+            request.setAttribute("list", list);
+
+            // Cho hiện view /toy.jsp
+            request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        if (page < 1) {
-            page = 1; // Ensure page does not go below 1
-        }
-
-        // Fetch paginated products
-        List<Product> list = productDAO.selectlist(page);
-
-        request.setAttribute("page", page);
-        request.setAttribute("total_page", total_page);
-        request.setAttribute("list", list);
-
-        // Cho hiện view /toy.jsp
-        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
-    } catch (SQLException ex) {
-        ex.printStackTrace();
     }
-}
-
 
     protected void index(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -121,6 +127,72 @@ public class ProductController extends HttpServlet {
         }
     }
 
+    protected void update(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        int id = Integer.parseInt(request.getParameter("id"));
+        String description = request.getParameter("description");
+        double price = Double.parseDouble(request.getParameter("price"));
+        double discount = Double.parseDouble(request.getParameter("discount"));
+        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        Product newProduct = new Product();
+        newProduct.setId(id);
+        newProduct.setDescription(description);
+        newProduct.setPrice(price);
+        newProduct.setDiscount(discount);
+        newProduct.setCategoryId(categoryId);
+        productDAO.update(newProduct);
+        System.out.println("hello");
+        session.setAttribute("product", newProduct);
+        request.setAttribute("message", "Update Success");
+        request.setAttribute("showUpdateProductModal", true);
+        request.setAttribute("controller", "product");
+        request.setAttribute("action", "productList");
+        response.sendRedirect(request.getContextPath() + "/product/productList.do");
+    }
+
+    protected void delete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        productDAO.delete(id);
+        request.setAttribute("message", "Product deleted successfully!");
+        response.sendRedirect(request.getContextPath() + "/product/productList.do"); // Redirect to product list
+    }
+
+    protected void add(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException, SQLException {
+    HttpSession session = request.getSession();
+    Account account = (Account) session.getAttribute("account");
+
+    // Retrieve form parameters
+    String description = request.getParameter("description");
+    double price = Double.parseDouble(request.getParameter("price"));
+    double discount = Double.parseDouble(request.getParameter("discount"));
+    int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+
+    // Create product object
+    Product newProduct = new Product();
+    newProduct.setDescription(description);
+    newProduct.setPrice(price);
+    newProduct.setDiscount(discount);
+    newProduct.setCategoryId(categoryId);
+
+    // Insert into database
+    productDAO.insert(newProduct);
+
+    // Store product in session
+    session.setAttribute("product", newProduct);
+    request.setAttribute("message", "Product Added Successfully!");
+    request.setAttribute("showAddProductModal", true);
+    request.setAttribute("controller", "product");
+    request.setAttribute("action", "productList");
+
+    // Redirect to product list
+    response.sendRedirect(request.getContextPath() + "/product/productList.do");
+}
+
+    
     protected void select(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
 
@@ -129,7 +201,7 @@ public class ProductController extends HttpServlet {
         List<Product> topProducts = productDAO.selectTop(4);
         List<Account> topAccounts = accountDAO.selectTop(4);
         List<Cart> topCarts = cartDAO.selectTop(4);
-        
+
         request.setAttribute("topProducts", topProducts);
         request.setAttribute("topAccounts", topAccounts);
         request.setAttribute("topCarts", topCarts);
@@ -138,25 +210,18 @@ public class ProductController extends HttpServlet {
 
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
-    
+
     protected void selectUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         List<Account> accounts = accountDAO.select();
         request.setAttribute("accounts", accounts);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
-    
+
     protected void selectProduct(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         List<Product> products = productDAO.select();
         request.setAttribute("products", products);
-        request.getRequestDispatcher(Config.ADMIN).forward(request, response);
-    }
-    
-    protected void selectCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException {
-        List<Cart> carts = cartDAO.select();
-        request.setAttribute("carts", carts);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
 

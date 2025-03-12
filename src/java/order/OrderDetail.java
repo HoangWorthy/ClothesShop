@@ -69,4 +69,12 @@ public class OrderDetail {
     public void setDiscount(double discount) {
         this.discount = discount;
     }
+    
+    public double getNewPrice() {
+        return price * (1 - this.discount);
+    }
+    
+    public double getNewTotal() {
+        return getNewPrice() * this.quantity;
+    }
 }

@@ -79,7 +79,7 @@ public class CartController extends HttpServlet {
             request.setAttribute("carts", carts);
             request.setAttribute("controller", "order");
             request.setAttribute("action", "select");
-            request.getRequestDispatcher("/order").forward(request, response);
+            request.getRequestDispatcher("/order/select.do").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }

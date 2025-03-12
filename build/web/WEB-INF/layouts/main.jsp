@@ -69,10 +69,11 @@
                             <c:if test="${account != null}">
                                 Welcome ${account.username} |
                                 <c:if test="${account.roleId.equals('AD')}">
-                                    <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/product/adminList.do"/>">Admin Dashboard</a> |
+                                    <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/product/adminList.do"/>">Admin Dashboard</a> |
                                 </c:if>
-                                <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3 pe-2" href="<c:url value="/cart/index.do" />"><i class="bi bi-cart"></i></a> | 
-                                <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/account/logout.do" />">Logout</a>
+                                <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3 pe-2" href="<c:url value="/cart/index.do" />"><i class="bi bi-cart"></i></a> | 
+                                <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3 pe-2" href="<c:url value="/account/update.do" />"  data-bs-toggle="modal" data-bs-target="#updateModal">Change Info</a> | 
+                                <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/account/logout.do" />">Logout</a>
                             </c:if>
                         </div>
                     </div>
@@ -178,7 +179,52 @@
                     </div>
                 </div>
             </div>
+            <!-- Update Modal -->
+            <div class="modal fade" data-bs-backdrop="static" id="updateModal">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Update Account</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            <form action="<c:url value='/account/update.do' />" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" name="password" value="${account.password}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" class="form-control" name="name" value="${account.name}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" class="form-control" name="address" value="${account.address}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" name="email" value="${account.email}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="text" class="form-control" name="phone" value="${account.phone}">
+                                </div>
+
+                                <i class="text-success">${message}</i>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-success" name="action" value="update">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <c:if test="${not empty showLoginModal}">
             <script>
                 $(document).ready(function () {
@@ -187,11 +233,11 @@
                 });
             </script>
         </c:if>
-        <c:if test="${not empty showRegisterModal}">
+        <c:if test="${not empty showUpdateModal}">
             <script>
                 $(document).ready(function () {
-                    var registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-                    registerModal.show();
+                    var updateModal = new bootstrap.Modal(document.getElementById('updateModal'));
+                    updateModal.show();
                 });
             </script>
         </c:if>
