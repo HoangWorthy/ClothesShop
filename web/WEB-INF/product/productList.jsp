@@ -135,7 +135,34 @@
                         <label class="form-label">Category ID</label>
                         <input type="number" id="modal-category" class="form-control" name="categoryId" required>
                     </div>
+                    <i class="text-danger">${message}</i>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Next</button>
+                    </div>
+                </form>
+            </div>
 
+        </div>
+    </div>
+</div>
+<!-- Product Picture Upload Modal -->
+<div class="modal fade" data-bs-backdrop="static" id="addProductPictureModal">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Product Picture</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form action="<c:url value='/product/addPicture.do' />" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Product Picture</label>
+                        <input type="file" id="modal-category" class="form-control" name="picture" required>
+                    </div>
                     <i class="text-danger">${message}</i>
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary">Add</button>
@@ -153,6 +180,14 @@
         $(document).ready(function () {
             var updateProductModal = new bootstrap.Modal(document.getElementById('updateProductModal'));
             updateProductModal.show();
+        });
+    </script>
+</c:if>
+<c:if test="${not empty showAddProductPictureModal}">
+    <script>
+        $(document).ready(function () {
+            var addProductPictureModal = new bootstrap.Modal(document.getElementById('addProductPictureModal'));
+            addProductPictureModal.show();
         });
     </script>
 </c:if>

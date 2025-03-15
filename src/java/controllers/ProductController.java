@@ -9,33 +9,43 @@ import account.Account;
 import account.AccountDAO;
 import cart.Cart;
 import cart.CartDAO;
+import java.io.File;
 import product.Product;
 import product.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 /**
  *
  * @author PHT
  */
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB before writing to disk
+    maxFileSize = 1024 * 1024 * 10,      // Max file size: 10MB
+    maxRequestSize = 1024 * 1024 * 50    // Max request size: 50MB
+)
 @WebServlet(name = "ProductController", urlPatterns = {"/product"})
-
 public class ProductController extends HttpServlet {
 
-    private ProductDAO productDAO = new ProductDAO();
-    private AccountDAO accountDAO = new AccountDAO();
-    private CartDAO cartDAO = new CartDAO();
+    private final ProductDAO productDAO = new ProductDAO();
+    private final AccountDAO accountDAO = new AccountDAO();
+    private final CartDAO cartDAO = new CartDAO();
+    private final String UPLOAD_DIR = "pics/products";
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -72,6 +82,9 @@ public class ProductController extends HttpServlet {
                     break;
                 case "productList":
                     selectProduct(request, response);
+                    break;
+                case "addPicture":
+                    addPicture(request, response);
                     break;
             }
         } catch (Exception e) {
@@ -161,38 +174,30 @@ public class ProductController extends HttpServlet {
     }
 
     protected void add(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException {
-    HttpSession session = request.getSession();
-    Account account = (Account) session.getAttribute("account");
+            throws ServletException, IOException, SQLException {         
+        HttpSession session = request.getSession();
 
-    // Retrieve form parameters
-    String description = request.getParameter("description");
-    double price = Double.parseDouble(request.getParameter("price"));
-    double discount = Double.parseDouble(request.getParameter("discount"));
-    int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        String description = request.getParameter("description");
+        Double price = Double.parseDouble(request.getParameter("price"));
+        Double discount = Double.parseDouble(request.getParameter("discount"));
+        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        
+        Product newProduct = new Product();
+        newProduct.setDescription(description);
+        newProduct.setPrice(price);
+        newProduct.setDiscount(discount);
+        newProduct.setCategoryId(categoryId);
+        
+        int id = productDAO.insert(newProduct);
+        newProduct.setId(id);
+        session.setAttribute("product", newProduct);
+        request.setAttribute("message", "Product Added Successfully!");
+        request.setAttribute("showAddProductPictureModal", true);
+        request.setAttribute("controller", "product");
+        request.setAttribute("action", "productList");
+        request.getRequestDispatcher("product/productList.do").forward(request, response);
+    }
 
-    // Create product object
-    Product newProduct = new Product();
-    newProduct.setDescription(description);
-    newProduct.setPrice(price);
-    newProduct.setDiscount(discount);
-    newProduct.setCategoryId(categoryId);
-
-    // Insert into database
-    productDAO.insert(newProduct);
-
-    // Store product in session
-    session.setAttribute("product", newProduct);
-    request.setAttribute("message", "Product Added Successfully!");
-    request.setAttribute("showAddProductModal", true);
-    request.setAttribute("controller", "product");
-    request.setAttribute("action", "productList");
-
-    // Redirect to product list
-    response.sendRedirect(request.getContextPath() + "/product/productList.do");
-}
-
-    
     protected void select(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
 
@@ -224,6 +229,27 @@ public class ProductController extends HttpServlet {
         request.setAttribute("products", products);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
+    private void addPicture(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HttpSession session = request.getSession();
+        Product product = (Product) session.getAttribute("product");
+        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) uploadDir.mkdir(); // Create directory if it doesn’t exist
+
+        // Get the file part
+        Part filePart = request.getPart("picture"); // Matches name="picture" in form
+        if (filePart != null && filePart.getSize() > 0) {
+            String fileName = String.format("%d.jpg", product.getId());
+            String filePath = uploadPath + File.separator + fileName;
+
+            // Save the file
+            filePart.write(filePath);
+        }
+        request.setAttribute("controller", "product");
+        request.setAttribute("action", "productList");
+        request.setAttribute("message", "Product Added Successfully!");
+        response.sendRedirect(request.getContextPath() + "/product/productList.do");
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -251,7 +277,12 @@ public class ProductController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String action = (String) request.getAttribute("action");
+        if ("addPicture".equals(action)) {
+            addPicture(request, response);
+        } else {
+            processRequest(request, response);
+        }
     }
 
     /**
@@ -263,5 +294,4 @@ public class ProductController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
