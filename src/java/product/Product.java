@@ -15,7 +15,8 @@ public class Product {
     private double price;
     private double discount;
     private int categoryId;
-
+    private boolean status;
+    
     public Product() {
     }
 
@@ -62,6 +63,12 @@ public class Product {
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
-    
-    
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 }

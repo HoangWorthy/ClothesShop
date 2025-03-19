@@ -11,22 +11,22 @@
         <div class="col-md-2 fw-normal fs-5" style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
             <div>
                 <h4> <span><img style="width: 50px; height: 50px" src="<c:url value="/pics/sortBy/sort.PNG"/>" /></span>Sort by</h4>
-                <form action="#" method="post">
+                <form action="<c:url value="/product/search.do"/>" method="get">
                     <div class="d-flex">
-                        <input class="form-control me-4" type="search" placeholder="Search" aria-label="Search">
+                        <input class="form-control me-4" type="search" placeholder="Search" aria-label="Search" name="searchInput">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </div>
                     <div class="container">
                         <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                            <input class="form-check-input" type="radio" name="filter" value="bestPrice" id="flexRadioDefault1">
                             <label class="form-check-label" for="flexRadioDefault1">Best Price</label>
                         </div>
                         <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                            <input class="form-check-input" type="radio" name="filter" value="lowestPrice" id="flexRadioDefault2">
                             <label class="form-check-label" for="flexRadioDefault2">Lowest Price</label>
                         </div>
                         <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                            <input class="form-check-input" type="radio" name="filter" value="highestPrice" id="flexRadioDefault3">
                             <label class="form-check-label" for="flexRadioDefault3">Highest Price</label>
                         </div>
                     </div>

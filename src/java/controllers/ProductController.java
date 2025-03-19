@@ -86,6 +86,9 @@ public class ProductController extends HttpServlet {
                 case "addPicture":
                     addPicture(request, response);
                     break;
+                case "active":
+                    active(request,response);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,6 +142,13 @@ public class ProductController extends HttpServlet {
             ex.printStackTrace();
         }
     }
+    
+    protected void active(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        productDAO.changeStatus(id, true);
+        response.sendRedirect(request.getContextPath() + "/product/productList.do"); // Redirect to product list
+    }
 
     protected void update(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -168,7 +178,7 @@ public class ProductController extends HttpServlet {
     protected void delete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         int id = Integer.parseInt(request.getParameter("id"));
-        productDAO.delete(id);
+        productDAO.changeStatus(id,false);
         request.setAttribute("message", "Product deleted successfully!");
         response.sendRedirect(request.getContextPath() + "/product/productList.do"); // Redirect to product list
     }

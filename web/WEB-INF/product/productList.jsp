@@ -15,19 +15,20 @@
 
     </div>
     <tr>
-        <th>No.</th>
-        <th>Image</th>
-        <th>Description</th>
+        <th class="text-center">No.</th>
+        <th class="text-center">Image</th>
+        <th class="text-center">Description</th>
         <th class="text-center">Unit Price</th>
         <th class="text-center">Discount</th>
         <th class="text-center">Discounted Price</th>
+        <th class="text-center">Status</th>
         <th class="text-center">Actions</th>
     </tr>
     <c:forEach var="product" items="${products}" varStatus="loop">
         <tr>
-            <td>${loop.count}</td>
-            <td><img src="<c:url value='/pics/products/${product.id}.jpg' />" height="80px" /></td>
-            <td>${product.description}</td>
+            <td class="text-center">${loop.count}</td>
+            <td class="text-center"><img src="<c:url value='/pics/products/${product.id}.jpg' />" height="80px" /></td>
+            <td class="text-center">${product.description}</td>
             <td class="text-center">
                 <fmt:formatNumber value="${product.price}" type="currency" />
             </td>
@@ -36,6 +37,9 @@
             </td>
             <td class="text-center">
                 <fmt:formatNumber value="${product.newPrice}" type="currency" />
+            </td>
+            <td class="text-center">
+                ${product.status == true ? "Available" : "Unavailable"}
             </td>
             <td class="text-center">
                 <!-- Add product details as data attributes -->
@@ -51,9 +55,9 @@
                    onclick="populateModal(this)">Edit
                 </a>
                 <a class="text-danger link-underline link-underline-opacity-0 ms-3" 
-                   href="<c:url value='/product/delete.do?id=${product.id}'/>"
-                   onclick="return confirm('Are you sure you want to delete this product?');">
-                    Delete
+                   href="<c:url value='/product/${product.status==true ? "delete":"active"}.do?id=${product.id}'/>"
+                   onclick="return confirm('Are you sure you want to ${product.status==true ? "delete":"active"} this product?');">
+                   ${product.status==true ? "Delete":"Active"}
                 </a>
             </td>
         </tr>
