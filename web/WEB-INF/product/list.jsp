@@ -13,16 +13,16 @@
                 <h4> <span><img style="width: 50px; height: 50px" src="<c:url value="/pics/sortBy/sort.PNG"/>" /></span>Sort by</h4>
                 <form action="<c:url value="/product/list.do"/>" method="get" id="sortForm">
                     <div class="d-flex">
-                        <input class="form-control me-4" type="search" placeholder="Search" aria-label="Search" name="searchInput">
+                        <input class="form-control me-4" type="search" placeholder="Search" aria-label="Search" name="search" value="${param.search}">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </div>
                     <div class="container">
                         <div class="form-check my-2" onclick="submitForm()">
-                            <input class="form-check-input" type="radio" name="filter" value="lowestPrice" id="flexRadioDefault2" >
+                            <input class="form-check-input" type="radio" name="filter" value="lowestPrice" id="flexRadioDefault2" ${lowestPrice}>
                             <label class="form-check-label" for="flexRadioDefault2">Lowest Price</label>
                         </div>
                         <div class="form-check my-2" onclick="submitForm()">
-                            <input class="form-check-input" type="radio" name="filter" value="highestPrice" id="flexRadioDefault3">
+                            <input class="form-check-input" type="radio" name="filter" value="highestPrice" id="flexRadioDefault3" ${highestPrice}>
                             <label class="form-check-label" for="flexRadioDefault3">Highest Price</label>
                         </div>
                     </div>
@@ -55,10 +55,10 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-10 text-center">
-            <a href="<c:url value='/product/list.do?page=1' />" class="btn btn-dark ${page==1?'disabled':''}"><i class="bi bi-caret-left"></i></a>
-            <a href="<c:url value='/product/list.do?page=${page-1}' />" class="btn btn-secondary ${page==1?'disabled':''}"><i class="bi bi-caret-left-fill"></i></a>
-            <a href="<c:url value='/product/list.do?page=${page+1}' />" class="btn btn-secondary ${page==total_page?'disabled':''}"><i class="bi bi-caret-right-fill"></i></a>
-            <a href="<c:url value='/product/list.do?page=${total_page}' />" class="btn btn-dark ${page==total_page?'disabled':''}"><i class="bi bi-caret-right"></i></a>
+            <a href="<c:url value='/product/list.do?page=1&search=${search}&filter=${filter}' />" class="btn btn-dark ${page==1?'disabled':''}"><i class="bi bi-caret-left"></i></a>
+            <a href="<c:url value='/product/list.do?page=${page-1}&search=${search}&filter=${filter}' />" class="btn btn-secondary ${page==1?'disabled':''}"><i class="bi bi-caret-left-fill"></i></a>
+            <a href="<c:url value='/product/list.do?page=${page+1}&search=${search}&filter=${filter}' />" class="btn btn-secondary ${page==total_page?'disabled':''}"><i class="bi bi-caret-right-fill"></i></a>
+            <a href="<c:url value='/product/list.do?page=${total_page}&search=${search}&filter=${filter}' />" class="btn btn-dark ${page==total_page?'disabled':''}"><i class="bi bi-caret-right"></i></a>
             Page ${page}/${total_page}
         </div>
     </div>

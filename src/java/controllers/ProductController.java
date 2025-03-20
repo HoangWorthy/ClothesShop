@@ -9,6 +9,8 @@ import account.Account;
 import account.AccountDAO;
 import cart.Cart;
 import cart.CartDAO;
+import category.Category;
+import category.CategoryDAO;
 import java.io.File;
 import product.Product;
 import product.ProductDAO;
@@ -44,8 +46,8 @@ public class ProductController extends HttpServlet {
     private final ProductDAO productDAO = new ProductDAO();
     private final AccountDAO accountDAO = new AccountDAO();
     private final CartDAO cartDAO = new CartDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
     private final String UPLOAD_DIR = "pics/products";
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -102,22 +104,33 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException {
     List<Product> products = productDAO.select();
     List<Product> list = new ArrayList<>();
-    int totalProducts = products.size();
-    int pageSize = (int) Math.ceil((double) totalProducts / 15);
     String filter = request.getParameter("filter");
+    String search = request.getParameter("search");
+    if (search != null){
+        List<Product> searchedProduct = new ArrayList();
+        for(Product product : products){
+            if(product.getDescription().toLowerCase().contains(search.toLowerCase()))
+                searchedProduct.add(product);
+        }
+        products = searchedProduct;
+    }
     if(filter != null){
         if(filter.equals("lowestPrice")) Collections.sort(products, new SortByPrice.PriceComparatorAsc());
         else if(filter.equals("highestPrice")) Collections.sort(products, new SortByPrice.PriceComparatorDesc());
+        request.setAttribute("lowestPrice", (filter.equals("lowestPrice")?"Checked":""));
+        request.setAttribute("highestPrice", (filter.equals("highestPrice")?"Checked":""));
     }
-    
+    int totalProducts = products.size();
+    int pageSize = (int) Math.ceil((double) totalProducts / 15);
     int page = Integer.parseInt((request.getParameter("page") == null) ? "1" : request.getParameter("page"));
     int startIndex = (page - 1) * 15;
-    int endIndex = Math.min(page * 15, totalProducts); // Ensures we do not exceed the size
+    int endIndex = Math.min(page * 15, totalProducts); 
 
     for (int i = startIndex; i < endIndex; i++) {
         list.add(products.get(i));
     }
-
+    request.setAttribute("filter", filter);
+    request.setAttribute("search", search);
     request.setAttribute("list", list);
     request.setAttribute("total_page", pageSize);
     request.setAttribute("page", page);
@@ -183,7 +196,7 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
         String description = request.getParameter("description");
         Double price = Double.parseDouble(request.getParameter("price"));
         Double discount = Double.parseDouble(request.getParameter("discount"));
-        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        int categoryId = Integer.parseInt(request.getParameter("category"));
         
         Product newProduct = new Product();
         newProduct.setDescription(description);
@@ -229,7 +242,9 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
     protected void selectProduct(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         List<Product> products = productDAO.select();
+        List<Category> categories = categoryDAO.selectAll();
         request.setAttribute("products", products);
+        request.setAttribute("categories", categories);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
     private void addPicture(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -248,8 +263,6 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
             // Save the file
             filePart.write(filePath);
         }
-        request.setAttribute("controller", "product");
-        request.setAttribute("action", "productList");
         request.setAttribute("message", "Product Added Successfully!");
         response.sendRedirect(request.getContextPath() + "/product/productList.do");
     }

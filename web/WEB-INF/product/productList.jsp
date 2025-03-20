@@ -129,15 +129,19 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Price</label>
-                        <input type="number" step="0.01" id="modal-price" class="form-control" name="price" required>
+                        <input type="number" id="modal-price" class="form-control" name="price" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Discount</label>
-                        <input type="number" step="0.01" id="modal-discount" class="form-control" name="discount" required>
+                        <input type="number" id="modal-discount" class="form-control" name="discount" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Category ID</label>
-                        <input type="number" id="modal-category" class="form-control" name="categoryId" required>
+                        <label class="form-label">Category</label>
+                        <select class="form-select" aria-label="Default select example" name="category">
+                            <c:forEach var="category" items="${categories}">
+                                <option value="${category.id}">${category.name}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                     <i class="text-danger">${message}</i>
                     <div class="d-flex justify-content-end">
