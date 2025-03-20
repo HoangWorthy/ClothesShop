@@ -25,7 +25,8 @@ public class ProductDAO {
         //Tạo kết nối db
         Connection con = DBContext.getConnection();
         //Tạo đối tượng Statement
-        PreparedStatement pst = con.prepareStatement("select * from Product ORDER BY status desc");
+        PreparedStatement pst = con.prepareStatement("select * from Product where status=? ORDER BY status desc");
+        pst.setBoolean(1, true);
         //Thực thi lệnh select
         ResultSet rs = pst.executeQuery();
         list = new ArrayList<>();
@@ -45,39 +46,6 @@ public class ProductDAO {
         con.close();
         return list;
     }
-
-    public List<Product> selectlist(int page) throws SQLException {
-    int pageSize = 15;
-    List<Product> list = new ArrayList<>();
-    
-    // Tạo kết nối db
-    Connection con = DBContext.getConnection();
-    String query = "SELECT * FROM Product WHERE status=? ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    
-    try (PreparedStatement stm = con.prepareStatement(query)) {
-        stm.setBoolean(1, true);
-        stm.setInt(2, (page - 1) * pageSize);
-        stm.setInt(3, pageSize);
-        
-        try (ResultSet rs = stm.executeQuery()) {
-            while (rs.next()) {
-                Product product = new Product();
-                product.setId(rs.getInt("id"));
-                product.setDescription(rs.getString("description"));
-                product.setPrice(rs.getDouble("price"));
-                product.setDiscount(rs.getDouble("discount"));
-                product.setCategoryId(rs.getInt("categoryId"));
-                product.setStatus(rs.getBoolean("status"));
-                list.add(product);
-            }
-        }
-    } finally {
-        con.close(); // Ensure connection is closed
-    }
-    
-    return list;
-}
-
     
 public List<Product> selectTop(int limit) throws SQLException {
     List<Product> list = new ArrayList<>();

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -25,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import utils.SortByPrice;
 
 /**
  *
@@ -95,42 +98,32 @@ public class ProductController extends HttpServlet {
         }
     }
 
-    protected void list(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            int page_size = 15;
-
-            // Lấy số trang
-            String spage = request.getParameter("page");
-            int page = (spage == null) ? 1 : Integer.parseInt(spage);
-
-            // Đọc table Product (previously named "Toy" in your comment)
-            int row_count = productDAO.count();
-
-            // Tính total_pages correctly
-            int total_page = (int) Math.ceil((double) row_count / page_size);
-
-            // Ensure page is within bounds
-            if (page > total_page) {
-                page = total_page; // If the page is out of range, go to the last page
-            }
-            if (page < 1) {
-                page = 1; // Ensure page does not go below 1
-            }
-
-            // Fetch paginated products
-            List<Product> list = productDAO.selectlist(page);
-
-            request.setAttribute("page", page);
-            request.setAttribute("total_page", total_page);
-            request.setAttribute("list", list);
-
-            // Cho hiện view /toy.jsp
-            request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+protected void list(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException, SQLException {
+    List<Product> products = productDAO.select();
+    List<Product> list = new ArrayList<>();
+    int totalProducts = products.size();
+    int pageSize = (int) Math.ceil((double) totalProducts / 15);
+    String filter = request.getParameter("filter");
+    if(filter != null){
+        if(filter.equals("lowestPrice")) Collections.sort(products, new SortByPrice.PriceComparatorAsc());
+        else if(filter.equals("highestPrice")) Collections.sort(products, new SortByPrice.PriceComparatorDesc());
     }
+    
+    int page = Integer.parseInt((request.getParameter("page") == null) ? "1" : request.getParameter("page"));
+    int startIndex = (page - 1) * 15;
+    int endIndex = Math.min(page * 15, totalProducts); // Ensures we do not exceed the size
+
+    for (int i = startIndex; i < endIndex; i++) {
+        list.add(products.get(i));
+    }
+
+    request.setAttribute("list", list);
+    request.setAttribute("total_page", pageSize);
+    request.setAttribute("page", page);
+    request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
+}
+
 
     protected void index(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

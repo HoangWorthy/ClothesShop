@@ -11,45 +11,45 @@
         <div class="col-md-2 fw-normal fs-5" style="position: sticky; top: 0; height: 100vh; overflow-y: auto;">
             <div>
                 <h4> <span><img style="width: 50px; height: 50px" src="<c:url value="/pics/sortBy/sort.PNG"/>" /></span>Sort by</h4>
-                <form action="<c:url value="/product/search.do"/>" method="get">
+                <form action="<c:url value="/product/list.do"/>" method="get" id="sortForm">
                     <div class="d-flex">
                         <input class="form-control me-4" type="search" placeholder="Search" aria-label="Search" name="searchInput">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </div>
                     <div class="container">
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="filter" value="bestPrice" id="flexRadioDefault1">
-                            <label class="form-check-label" for="flexRadioDefault1">Best Price</label>
-                        </div>
-                        <div class="form-check my-2">
-                            <input class="form-check-input" type="radio" name="filter" value="lowestPrice" id="flexRadioDefault2">
+                        <div class="form-check my-2" onclick="submitForm()">
+                            <input class="form-check-input" type="radio" name="filter" value="lowestPrice" id="flexRadioDefault2" >
                             <label class="form-check-label" for="flexRadioDefault2">Lowest Price</label>
                         </div>
-                        <div class="form-check my-2">
+                        <div class="form-check my-2" onclick="submitForm()">
                             <input class="form-check-input" type="radio" name="filter" value="highestPrice" id="flexRadioDefault3">
                             <label class="form-check-label" for="flexRadioDefault3">Highest Price</label>
                         </div>
                     </div>
                 </form>
             </div>
-
         </div>
-        <div class="col-md-10 row row-cols-md-5 text-center">
-            <c:forEach var="product" items="${list}">
-                <div class="col ms-auto my-3">
-                    <div class="card border border-secondary border-4" style="width: 18rem;">
-                        <img src="<c:url value="/pics/products/${product.id}.jpg" />" width="286px" height="382px"  class="card-img-top">
-                        <div class="card-body">
-                            <h5 class="card-title fw-semibold">${product.description}</h5>
-                            <h6 class="card-title text-danger fw-semibold"><fmt:formatNumber value="${product.newPrice}" type="currency" /> | <fmt:formatNumber value="-${product.discount}" type="percent" /></h6>
-                            <div class="d-grid gap-2 d-md-flex justify-content-center">
-                                <a href="" class="btn btn-secondary">View</a>
-                                <a href="<c:url value="/cart/add.do?productId=${product.id}&quantity=1"/>" class="btn btn-secondary"><i class="bi bi-cart-plus"></i></a>
+        <div class="col-md-10">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+                <c:forEach var="product" items="${list}">
+                    <div class="col">
+                        <div class="card border border-secondary border-4 h-100">
+                            <img src="<c:url value="/pics/products/${product.id}.jpg" />" class="card-img-top" style="width: 100%; height: 60%;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-semibold">${product.description}</h5>
+                                <h6 class="card-title text-danger fw-semibold">
+                                    <fmt:formatNumber value="${product.newPrice}" type="currency" /> | 
+                                    <fmt:formatNumber value="-${product.discount}" type="percent" />
+                                </h6>
+                                <div class="mt-auto d-grid gap-2">
+                                    <a href="" class="btn btn-secondary">View</a>
+                                    <a href="<c:url value="/cart/add.do?productId=${product.id}&quantity=1"/>" class="btn btn-secondary"><i class="bi bi-cart-plus"></i></a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </c:forEach>
+                </c:forEach>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -63,5 +63,10 @@
         </div>
     </div>
 </div>
+<script>
+    function submitForm() {
+        document.getElementById("sortForm").submit();
+    }
+</script>
 
 
