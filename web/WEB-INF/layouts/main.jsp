@@ -31,29 +31,12 @@
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Men's Clothes
+                                    Unisex's Clothes
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Shirts</a></li>
-                                    <li><a class="dropdown-item" href="#">Pants</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Women's Clothes
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Shirts</a></li>
-                                    <li><a class="dropdown-item" href="#">Pants</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Unisex
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Shirts</a></li>
-                                    <li><a class="dropdown-item" href="#">Pants</a></li>
+                                    <c:forEach var="category" items="${categories}">
+                                        <li><a class="dropdown-item" href="/ClothesShop/product/list.do?search=&category=${category.id}">${category.name}</a></li>
+                                    </c:forEach>
                                 </ul>
                             </li>
                             <li class="nav-item">

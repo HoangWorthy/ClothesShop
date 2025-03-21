@@ -52,12 +52,14 @@
                    data-price="${product.price}"
                    data-discount="${product.discount}"
                    data-category="${product.categoryId}"
+                   data-status="${product.status ? 'true' : 'false'}"
+
                    onclick="populateModal(this)">Edit
                 </a>
                 <a class="text-danger link-underline link-underline-opacity-0 ms-3" 
                    href="<c:url value='/product/${product.status==true ? "delete":"active"}.do?id=${product.id}'/>"
-                   onclick="return confirm('Are you sure you want to ${product.status==true ? "delete":"active"} this product?');">
-                   ${product.status==true ? "Delete":"Active"}
+                   onclick="return confirm('Are you sure you want to ${product.status==true ? "deactivate":"activate"} this product?');">
+                    ${product.status==true ? "Deactivate":"Activate"}
                 </a>
             </td>
         </tr>
@@ -79,6 +81,7 @@
             <div class="modal-body">
                 <form action="<c:url value='/product/update.do' />" method="POST">
                     <input type="hidden" id="modal-product-id" name="id">
+                    <input type="hidden" id="modal-status" name="status">
 
                     <div class="mb-3">
                         <label class="form-label">Description</label>
@@ -94,9 +97,13 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Category ID</label>
-                        <input type="number" id="modal-category" class="form-control" name="categoryId">
+                        <select class="form-select" name="categoryId" aria-label="Default select example">
+                            <option selected>Choose</option>
+                            <c:forEach var="category" items="${categories}">
+                                <option value="${category.id}" ${(category.id == categoryFilter) ? "selected" : ""}>${category.name}</option>
+                            </c:forEach>
+                        </select>
                     </div>
-
                     <i class="text-danger">${message}</i>
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-success">Update</button>
@@ -211,6 +218,7 @@
 <script>
     function populateModal(element) {
         // Get data from the clicked link
+        const status = element.getAttribute("data-status");
         const productId = element.getAttribute("data-id");
         const description = element.getAttribute("data-description");
         const price = element.getAttribute("data-price");
@@ -218,6 +226,7 @@
         const categoryId = element.getAttribute("data-category");
 
         // Set modal input fields
+        document.getElementById("modal-status").value = status === "true" ? "true" : "false";
         document.getElementById("modal-product-id").value = productId;
         document.getElementById("modal-description").value = description;
         document.getElementById("modal-price").value = price;

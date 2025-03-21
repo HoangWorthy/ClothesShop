@@ -8,6 +8,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+
 <div class="mt-5">
     <table  class="table table-secondary border-top border-secondary border-2">
         <div class="text-center">
@@ -15,17 +16,19 @@
         </div>
         <tr>
             <th>No.</th>
-            <th>Address</th>
-            <th class="text-center">date</th>
-            <th class="text-center">status</th>
+            <th>Username</th>
+            <th class="text-center">Create's Date</th>
+            <th class="text-center">Ship Address</th>
+            <th class="text-center">Status</th>
             <th class="text-center">Actions</th>
 
         </tr>
         <c:forEach var="order" items="${orders}" varStatus="loop">
             <tr>
                 <td>${loop.count}</td>
-                <td>${order.shipToAddress}</td>
+                <td>${order.accountId}</td>
                 <td class="text-center">${order.date}</td>
+                <td class="text-center">${order.shipToAddress}</td>
                 <td class="text-center">
                     <form id="status-form-${order.id}" action="<c:url value='/order/changeStatus.do'/>" method="POST">
                         <input type="hidden" name="id" value="${order.id}">
@@ -81,7 +84,7 @@
 <script>
     function changeStatus(orderId, newStatus, event) {
         event.preventDefault(); // Prevents the default link action
-        
+
         // Update the hidden input field with the new status
         document.getElementById('status-input-' + orderId).value = newStatus;
 

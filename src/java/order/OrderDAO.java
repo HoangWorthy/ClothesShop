@@ -12,8 +12,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import product.Product;
 
 /**
@@ -41,53 +46,35 @@ public class OrderDAO {
         return orders;
     }
 
-    public double calcRevenueInterval7Days(String date) throws SQLException {
-    double revenue = 0;
-    Connection conn = DBContext.getConnection();
+    public List<Order> selectTop(int limit) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String query = "SELECT TOP " + limit + " * FROM OrderHeader ORDER BY date DESC"; // Hardcoding limit
 
-    String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue " +
-                 "FROM OrderDetail od " +
-                 "JOIN OrderHeader oh ON od.orderHeaderId = oh.id " +
-                 "WHERE oh.date BETWEEN DATEADD(day, -6, CAST(? AS DATE)) AND CAST(? AS DATE);";
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement pst = conn.prepareStatement(query)) {
+            ResultSet rs = pst.executeQuery();
 
-    PreparedStatement ps = conn.prepareStatement(sql);
-    ps.setString(1, date);
-    ps.setString(2, date);
-
-    ResultSet rs = ps.executeQuery();
-    if (rs.next()) {
-        revenue = rs.getDouble("revenue");
-    }
-    conn.close();
-    return revenue;
-    }
-    
-    public double calcRevenueADay(String date) throws SQLException{
-        double revenue = 0;
-        Connection conn = DBContext.getConnection();
-        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue " +
-                        "FROM OrderDetail od " +
-                        "JOIN OrderHeader oh ON od.orderHeaderId = oh.id " +
-                        "WHERE CONVERT(DATE, oh.date) = CONVERT(DATE, ?);";
-
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, date);
-
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            revenue = rs.getDouble("revenue");
+            while (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt("id"));
+                order.setDate(rs.getDate("date"));
+                order.setAccountId(rs.getString("accountId"));
+                order.setStatus(rs.getString("status"));
+                order.setShipToAddress(rs.getString("shipToAddress"));
+                orders.add(order);
+            }
         }
-        conn.close();
-        return revenue;
+        return orders;
     }
-    
-    public double calcRevenueAMonth(String date) throws SQLException{
+
+    public double calcRevenueInterval7Days(String date) throws SQLException {
         double revenue = 0;
         Connection conn = DBContext.getConnection();
-        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue " +
-                        "FROM OrderDetail od " +
-                        "JOIN OrderHeader oh ON od.orderHeaderId = oh.id " +
-                        "WHERE YEAR(oh.date) = YEAR(?) AND MONTH(oh.date) = MONTH(?);";
+
+        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue "
+                + "FROM OrderDetail od "
+                + "JOIN OrderHeader oh ON od.orderHeaderId = oh.id "
+                + "WHERE oh.date BETWEEN DATEADD(day, -6, CAST(? AS DATE)) AND CAST(? AS DATE);";
 
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, date);
@@ -100,17 +87,92 @@ public class OrderDAO {
         conn.close();
         return revenue;
     }
+
+    public List<Double> calcRevenueLast7Days(String date) throws SQLException {
+    List<Double> revenueList = new ArrayList<>(Collections.nCopies(7, 0.0)); // Initialize with 7 zeroes
+    Connection conn = DBContext.getConnection();
+
+    String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue, CAST(oh.date AS DATE) AS order_date " +
+                 "FROM OrderDetail od " +
+                 "JOIN OrderHeader oh ON od.orderHeaderId = oh.id " +
+                 "WHERE oh.date BETWEEN DATEADD(day, -6, CAST(? AS DATE)) AND CAST(? AS DATE) " +
+                 "GROUP BY CAST(oh.date AS DATE) " +
+                 "ORDER BY order_date";
+
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setString(1, date);
+    ps.setString(2, date);
+
+    ResultSet rs = ps.executeQuery();
     
-    public double calcRevenueAYear(String date) throws SQLException{
+    // Map for quick lookup
+    Map<String, Double> revenueMap = new HashMap<>();
+    while (rs.next()) {
+        revenueMap.put(rs.getString("order_date"), rs.getDouble("revenue"));
+    }
+
+    conn.close();
+
+    // Ensure correct mapping for last 7 days
+    LocalDate selectedDate = LocalDate.parse(date);
+    for (int i = 6; i >= 0; i--) {
+        String day = selectedDate.minusDays(i).toString();
+        revenueList.set(6 - i, revenueMap.getOrDefault(day, 0.0));
+    }
+
+    return revenueList;
+}
+
+
+    public double calcRevenueADay(String date) throws SQLException {
         double revenue = 0;
         Connection conn = DBContext.getConnection();
-        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue " +
-                        "FROM OrderDetail od " +
-                        "JOIN OrderHeader oh ON od.orderHeaderId = oh.id " +
-                        "WHERE YEAR(oh.date) = ?;";
+        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue "
+                + "FROM OrderDetail od "
+                + "JOIN OrderHeader oh ON od.orderHeaderId = oh.id "
+                + "WHERE CONVERT(DATE, oh.date) = CONVERT(DATE, ?);";
 
         PreparedStatement ps = conn.prepareStatement(sql);
-        int year = Integer.parseInt(date.substring(0, 4)); 
+        ps.setString(1, date);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            revenue = rs.getDouble("revenue");
+        }
+        conn.close();
+        return revenue;
+    }
+
+    public double calcRevenueAMonth(String date) throws SQLException {
+        double revenue = 0;
+        Connection conn = DBContext.getConnection();
+        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue "
+                + "FROM OrderDetail od "
+                + "JOIN OrderHeader oh ON od.orderHeaderId = oh.id "
+                + "WHERE YEAR(oh.date) = YEAR(?) AND MONTH(oh.date) = MONTH(?);";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, date);
+        ps.setString(2, date);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            revenue = rs.getDouble("revenue");
+        }
+        conn.close();
+        return revenue;
+    }
+
+    public double calcRevenueAYear(String date) throws SQLException {
+        double revenue = 0;
+        Connection conn = DBContext.getConnection();
+        String sql = "SELECT SUM((price - (price * discount)) * quantity) AS revenue "
+                + "FROM OrderDetail od "
+                + "JOIN OrderHeader oh ON od.orderHeaderId = oh.id "
+                + "WHERE YEAR(oh.date) = ?;";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        int year = Integer.parseInt(date.substring(0, 4));
         ps.setInt(1, year);
 
         ResultSet rs = ps.executeQuery();
@@ -120,7 +182,7 @@ public class OrderDAO {
         conn.close();
         return revenue;
     }
-    
+
     public void create(Account account, List<OrderDetail> orderDetails) throws SQLException {
         Connection conn = DBContext.getConnection();
         PreparedStatement pstHeader = null;

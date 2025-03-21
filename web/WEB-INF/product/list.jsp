@@ -12,10 +12,11 @@
             <div>
                 <h4> <span><img style="width: 50px; height: 50px" src="<c:url value="/pics/sortBy/sort.PNG"/>" /></span>Sort by</h4>
                 <form action="<c:url value="/product/list.do"/>" method="get" id="sortForm">
-                    <div class="d-flex">
+                    <div class="d-flex ">
                         <input class="form-control me-4" type="search" placeholder="Search" aria-label="Search" name="search" value="${param.search}">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </div>
+                    <hr>
                     <div class="container">
                         <div class="form-check my-2" onclick="submitForm()">
                             <input class="form-check-input" type="radio" name="filter" value="lowestPrice" id="flexRadioDefault2" ${lowestPrice}>
@@ -25,24 +26,22 @@
                             <input class="form-check-input" type="radio" name="filter" value="highestPrice" id="flexRadioDefault3" ${highestPrice}>
                             <label class="form-check-label" for="flexRadioDefault3">Highest Price</label>
                         </div>
-                        <div class="form-check my-2" onchange="submitForm()">
-                            <label class=   "form-check-label" for="flexRadioDefault3">Category</label><br>
-                            <select name="category" onchange="submitForm()">
-                                <c:if test="${categoryFilter==null}">
-                                    <option value="skip">Choose category</option>
-                                </c:if>
+                        <hr>
+                        <div class="me-5 my-3">
+                            <select name="category" class="form-select" onchange="submitForm()">
+                                <option value="" ${empty categoryFilter ? 'selected' : ''}>Category</option>
                                 <c:forEach var="category" items="${categories}">
-                                    <option value="${category.id}" ${(category.id == categoryFilter)?"selected":""}>${category.name}</option>
+                                    <option value="${category.id}" ${(category.id == categoryFilter) ? "selected" : ""}>${category.name}</option>
                                 </c:forEach>
                             </select>
                         </div>
-                        <br>
+                        <hr>
                     </div>
                 </form>
-                <a href="<c:url value="/product/list.do"/>"><button>Clear Filter</button></a>
+                <a class="btn btn-outline-danger d-flex p-2 fw-semibold justify-content-center" role="button" href="<c:url value="/product/list.do"/>">Reset All Filters</a>
             </div>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10 mt-3">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
                 <c:forEach var="product" items="${list}">
                     <div class="col">
@@ -65,7 +64,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-md-2"></div>
         <div class="col-md-10 text-center">
             <a href="<c:url value='/product/list.do?page=1&search=${search}&filter=${filter}&category=${categoryFilter}' />" class="btn btn-dark ${page==1?'disabled':''}"><i class="bi bi-caret-left"></i></a>

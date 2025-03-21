@@ -10,7 +10,9 @@ import cart.CartDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +24,7 @@ import order.Order;
 import order.OrderDAO;
 import order.OrderDetail;
 import product.Product;
+import product.ProductDAO;
 
 /**
  *
@@ -31,6 +34,7 @@ import product.Product;
 public class OrderController extends HttpServlet {
 
     private OrderDAO orderDAO = new OrderDAO();
+    private ProductDAO productDAO = new ProductDAO();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -79,21 +83,35 @@ public class OrderController extends HttpServlet {
         request.setAttribute("orders", orders);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
-    
+
     protected void getRevenue(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException {
-        String date = request.getParameter("date");
-        double revenueIntervalDay = orderDAO.calcRevenueInterval7Days(date);
-        double revenueADay = orderDAO.calcRevenueADay(date);
-        double revenueAMonth = orderDAO.calcRevenueAMonth(date);
-        double revenueAYear = orderDAO.calcRevenueAYear(date);
-        request.setAttribute("revenueIntervalDay", revenueIntervalDay);
-        request.setAttribute("revenueADAY", revenueADay);
-        request.setAttribute("revenueAMonth", revenueAMonth);
-        request.setAttribute("revenueAYear", revenueAYear);
-        // Chua redirect di dau, design di roi coi thich redirect di dau thi redirect
-        // Da test rui a cu lay ma sai thui
+        throws ServletException, IOException, SQLException {
+    String date = request.getParameter("date");
+    if (date == null || date.isEmpty()) {
+        date = LocalDate.now().toString();
     }
+
+    double revenueIntervalDay = orderDAO.calcRevenueInterval7Days(date);
+    double revenueADay = orderDAO.calcRevenueADay(date);
+    double revenueAMonth = orderDAO.calcRevenueAMonth(date);
+    double revenueAYear = orderDAO.calcRevenueAYear(date);
+
+    List<Double> revenueLast7Days = orderDAO.calcRevenueLast7Days(date);
+    System.out.println("Revenue Last 7 Days: " + revenueLast7Days);
+    if (revenueLast7Days == null) {
+        revenueLast7Days = new ArrayList<>(Collections.nCopies(7, 0.0)); // Ensure 7 zero values
+    }
+System.out.println("Revenue Last 7 Days: " + revenueLast7Days);
+    request.setAttribute("revenueIntervalDay", revenueIntervalDay);
+    request.setAttribute("revenueADay", revenueADay);
+    request.setAttribute("revenueAMonth", revenueAMonth);
+    request.setAttribute("revenueAYear", revenueAYear);
+    request.setAttribute("revenueLast7Days", revenueLast7Days);
+    request.setAttribute("selectedDate", date);
+
+    request.getRequestDispatcher("/product/adminList.do").forward(request, response);
+}
+
 
     protected void create(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -112,11 +130,9 @@ public class OrderController extends HttpServlet {
         }
         orderDAO.create(account, orderDetails);
         cartDAO.emptyAll(account.getUsername());
-//        request.setAttribute("action", "ADMINlist");
-//        selectAll(request, response);
         request.getRequestDispatcher("/cart/index.do").forward(request, response);
-
     }
+
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

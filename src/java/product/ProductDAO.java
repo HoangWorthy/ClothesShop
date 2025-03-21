@@ -25,8 +25,7 @@ public class ProductDAO {
         //Tạo kết nối db
         Connection con = DBContext.getConnection();
         //Tạo đối tượng Statement
-        PreparedStatement pst = con.prepareStatement("select * from Product where status=? ORDER BY status desc");
-        pst.setBoolean(1, true);
+        PreparedStatement pst = con.prepareStatement("select * from Product ORDER BY status desc");
         //Thực thi lệnh select
         ResultSet rs = pst.executeQuery();
         list = new ArrayList<>();

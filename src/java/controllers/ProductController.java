@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import order.Order;
+import order.OrderDAO;
 import utils.SortByPrice;
 
 /**
@@ -36,21 +39,21 @@ import utils.SortByPrice;
  * @author PHT
  */
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, // 2MB before writing to disk
-    maxFileSize = 1024 * 1024 * 10,      // Max file size: 10MB
-    maxRequestSize = 1024 * 1024 * 50    // Max request size: 50MB
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB before writing to disk
+        maxFileSize = 1024 * 1024 * 10, // Max file size: 10MB
+        maxRequestSize = 1024 * 1024 * 50 // Max request size: 50MB
 )
 @WebServlet(name = "ProductController", urlPatterns = {"/product"})
 public class ProductController extends HttpServlet {
 
     private final ProductDAO productDAO = new ProductDAO();
     private final AccountDAO accountDAO = new AccountDAO();
-    private final CartDAO cartDAO = new CartDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
     private final CategoryDAO categoryDAO = new CategoryDAO();
     private final String UPLOAD_DIR = "pics/products";
+
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -92,7 +95,7 @@ public class ProductController extends HttpServlet {
                     addPicture(request, response);
                     break;
                 case "active":
-                    active(request,response);
+                    active(request, response);
                     break;
             }
         } catch (Exception e) {
@@ -100,68 +103,75 @@ public class ProductController extends HttpServlet {
         }
     }
 
-protected void list(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException {
-    List<Product> products = productDAO.select();
-    List<Product> list = new ArrayList<>();
-    List<Category> categories = categoryDAO.selectAll();
-    String filter = request.getParameter("filter");
-    String search = request.getParameter("search");
-    String category = request.getParameter("category");
-    if (search != null){
-        List<Product> searchedProduct = new ArrayList();
-        for(Product product : products){
-            if(product.getDescription().toLowerCase().contains(search.toLowerCase()))
-                searchedProduct.add(product);
+    protected void list(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        List<Product> products = productDAO.select();
+        List<Product> list = new ArrayList<>();
+        List<Category> categories = categoryDAO.selectAll();
+        String filter = request.getParameter("filter");
+        String search = request.getParameter("search");
+        String category = request.getParameter("category");
+        System.out.println(category);
+        if (search != null) {
+            List<Product> searchedProduct = new ArrayList();
+            for (Product product : products) {
+                if (product.getDescription().toLowerCase().contains(search.toLowerCase())) {
+                    searchedProduct.add(product);
+                }
+            }
+            products = searchedProduct;
         }
-        products = searchedProduct;
-    }
-    if(filter != null){
-        if(filter.equals("lowestPrice")) Collections.sort(products, new SortByPrice.PriceComparatorAsc());
-        else if(filter.equals("highestPrice")) Collections.sort(products, new SortByPrice.PriceComparatorDesc());
-        request.setAttribute("lowestPrice", (filter.equals("lowestPrice")?"Checked":""));
-        request.setAttribute("highestPrice", (filter.equals("highestPrice")?"Checked":""));
-    }
-    if(category != null && !category.equals("skip")){
-        int categoryId = Integer.parseInt(category);
-        List<Product> searchedProduct = new ArrayList();
-        for(Product product : products){
-            if(categoryId == product.getCategoryId())
-                searchedProduct.add(product);
+        if (filter != null) {
+            if (filter.equals("lowestPrice")) {
+                Collections.sort(products, new SortByPrice.PriceComparatorAsc());
+            } else if (filter.equals("highestPrice")) {
+                Collections.sort(products, new SortByPrice.PriceComparatorDesc());
+            }
+            request.setAttribute("lowestPrice", (filter.equals("lowestPrice") ? "Checked" : ""));
+            request.setAttribute("highestPrice", (filter.equals("highestPrice") ? "Checked" : ""));
         }
-        products = searchedProduct;
-    }
-    int totalProducts = products.size();
-    int pageSize = (int) Math.ceil((double) totalProducts / 15);
-    int page = Integer.parseInt((request.getParameter("page") == null) ? "1" : request.getParameter("page"));
-    int startIndex = (page - 1) * 15;
-    int endIndex = Math.min(page * 15, totalProducts); 
+        if (category != null && !category.isEmpty()) {
+            int categoryId = Integer.parseInt(category);
+            List<Product> searchedProduct = new ArrayList();
+            for (Product product : products) {
+                if (categoryId == product.getCategoryId()) {
+                    searchedProduct.add(product);
+                }
+            }
+            products = searchedProduct;
+        }
+        int totalProducts = products.size();
+        int pageSize = (int) Math.ceil((double) totalProducts / 15);
+        int page = Integer.parseInt((request.getParameter("page") == null) ? "1" : request.getParameter("page"));
+        int startIndex = (page - 1) * 15;
+        int endIndex = Math.min(page * 15, totalProducts);
 
-    for (int i = startIndex; i < endIndex; i++) {
-        list.add(products.get(i));
+        for (int i = startIndex; i < endIndex; i++) {
+            list.add(products.get(i));
+        }
+        request.setAttribute("categories", categories);
+        request.setAttribute("categoryFilter", category);
+        request.setAttribute("filter", filter);
+        request.setAttribute("search", search);
+        request.setAttribute("list", list);
+        request.setAttribute("total_page", pageSize);
+        request.setAttribute("page", page);
+        request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
     }
-    request.setAttribute("categories", categories);
-    request.setAttribute("categoryFilter", category);
-    request.setAttribute("filter", filter);
-    request.setAttribute("search", search);
-    request.setAttribute("list", list);
-    request.setAttribute("total_page", pageSize);
-    request.setAttribute("page", page);
-    request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
-}
-
 
     protected void index(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             List<Product> top = productDAO.selectTop(8);
+            List<Category> categories = categoryDAO.selectAll();
             request.setAttribute("top", top);
+            request.setAttribute("categories", categories);
             request.getRequestDispatcher(Config.LAYOUT).forward(request, response);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
-    
+
     protected void active(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         int id = Integer.parseInt(request.getParameter("id"));
@@ -178,12 +188,14 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
         double price = Double.parseDouble(request.getParameter("price"));
         double discount = Double.parseDouble(request.getParameter("discount"));
         int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        boolean status = Boolean.parseBoolean(request.getParameter("status"));
         Product newProduct = new Product();
         newProduct.setId(id);
         newProduct.setDescription(description);
         newProduct.setPrice(price);
         newProduct.setDiscount(discount);
         newProduct.setCategoryId(categoryId);
+        newProduct.setStatus(status);
         productDAO.update(newProduct);
         System.out.println("hello");
         session.setAttribute("product", newProduct);
@@ -197,26 +209,26 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
     protected void delete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         int id = Integer.parseInt(request.getParameter("id"));
-        productDAO.changeStatus(id,false);
+        productDAO.changeStatus(id, false);
         request.setAttribute("message", "Product deleted successfully!");
         response.sendRedirect(request.getContextPath() + "/product/productList.do"); // Redirect to product list
     }
 
     protected void add(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException {         
+            throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
 
         String description = request.getParameter("description");
         Double price = Double.parseDouble(request.getParameter("price"));
         Double discount = Double.parseDouble(request.getParameter("discount"));
         int categoryId = Integer.parseInt(request.getParameter("category"));
-        
+
         Product newProduct = new Product();
         newProduct.setDescription(description);
         newProduct.setPrice(price);
         newProduct.setDiscount(discount);
         newProduct.setCategoryId(categoryId);
-        
+
         int id = productDAO.insert(newProduct);
         newProduct.setId(id);
         session.setAttribute("product", newProduct);
@@ -232,13 +244,14 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
 
         int totalProducts = productDAO.count();
         int totalAccounts = accountDAO.count();
+
         List<Product> topProducts = productDAO.selectTop(4);
         List<Account> topAccounts = accountDAO.selectTop(4);
-        List<Cart> topCarts = cartDAO.selectTop(4);
-
+        List<Order> topOrders = orderDAO.selectTop(4);                
+        
         request.setAttribute("topProducts", topProducts);
         request.setAttribute("topAccounts", topAccounts);
-        request.setAttribute("topCarts", topCarts);
+        request.setAttribute("topOrders", topOrders);
         request.setAttribute("totalAccounts", totalAccounts);
         request.setAttribute("totalProducts", totalProducts);
 
@@ -260,13 +273,15 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
         request.setAttribute("categories", categories);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
     }
+
     private void addPicture(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
         Product product = (Product) session.getAttribute("product");
         String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
         File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdir(); // Create directory if it doesn’t exist
-
+        if (!uploadDir.exists()) {
+            uploadDir.mkdir(); // Create directory if it doesn’t exist
+        }
         // Get the file part
         Part filePart = request.getPart("picture"); // Matches name="picture" in form
         if (filePart != null && filePart.getSize() > 0) {
