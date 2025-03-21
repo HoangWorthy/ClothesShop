@@ -25,8 +25,21 @@
                             <input class="form-check-input" type="radio" name="filter" value="highestPrice" id="flexRadioDefault3" ${highestPrice}>
                             <label class="form-check-label" for="flexRadioDefault3">Highest Price</label>
                         </div>
+                        <div class="form-check my-2" onchange="submitForm()">
+                            <label class=   "form-check-label" for="flexRadioDefault3">Category</label><br>
+                            <select name="category" onchange="submitForm()">
+                                <c:if test="${categoryFilter==null}">
+                                    <option value="skip">Choose category</option>
+                                </c:if>
+                                <c:forEach var="category" items="${categories}">
+                                    <option value="${category.id}" ${(category.id == categoryFilter)?"selected":""}>${category.name}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <br>
                     </div>
                 </form>
+                <a href="<c:url value="/product/list.do"/>"><button>Clear Filter</button></a>
             </div>
         </div>
         <div class="col-md-10">
@@ -55,10 +68,10 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-10 text-center">
-            <a href="<c:url value='/product/list.do?page=1&search=${search}&filter=${filter}' />" class="btn btn-dark ${page==1?'disabled':''}"><i class="bi bi-caret-left"></i></a>
-            <a href="<c:url value='/product/list.do?page=${page-1}&search=${search}&filter=${filter}' />" class="btn btn-secondary ${page==1?'disabled':''}"><i class="bi bi-caret-left-fill"></i></a>
-            <a href="<c:url value='/product/list.do?page=${page+1}&search=${search}&filter=${filter}' />" class="btn btn-secondary ${page==total_page?'disabled':''}"><i class="bi bi-caret-right-fill"></i></a>
-            <a href="<c:url value='/product/list.do?page=${total_page}&search=${search}&filter=${filter}' />" class="btn btn-dark ${page==total_page?'disabled':''}"><i class="bi bi-caret-right"></i></a>
+            <a href="<c:url value='/product/list.do?page=1&search=${search}&filter=${filter}&category=${categoryFilter}' />" class="btn btn-dark ${page==1?'disabled':''}"><i class="bi bi-caret-left"></i></a>
+            <a href="<c:url value='/product/list.do?page=${page-1}&search=${search}&filter=${filter}&category=${categoryFilter}' />" class="btn btn-secondary ${page==1?'disabled':''}"><i class="bi bi-caret-left-fill"></i></a>
+            <a href="<c:url value='/product/list.do?page=${page+1}&search=${search}&filter=${filter}&category=${categoryFilter}' />" class="btn btn-secondary ${page==total_page?'disabled':''}"><i class="bi bi-caret-right-fill"></i></a>
+            <a href="<c:url value='/product/list.do?page=${total_page}&search=${search}&filter=${filter}&category=${categoryFilter}' />" class="btn btn-dark ${page==total_page?'disabled':''}"><i class="bi bi-caret-right"></i></a>
             Page ${page}/${total_page}
         </div>
     </div>

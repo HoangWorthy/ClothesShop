@@ -104,8 +104,10 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException {
     List<Product> products = productDAO.select();
     List<Product> list = new ArrayList<>();
+    List<Category> categories = categoryDAO.selectAll();
     String filter = request.getParameter("filter");
     String search = request.getParameter("search");
+    String category = request.getParameter("category");
     if (search != null){
         List<Product> searchedProduct = new ArrayList();
         for(Product product : products){
@@ -120,6 +122,15 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
         request.setAttribute("lowestPrice", (filter.equals("lowestPrice")?"Checked":""));
         request.setAttribute("highestPrice", (filter.equals("highestPrice")?"Checked":""));
     }
+    if(category != null && !category.equals("skip")){
+        int categoryId = Integer.parseInt(category);
+        List<Product> searchedProduct = new ArrayList();
+        for(Product product : products){
+            if(categoryId == product.getCategoryId())
+                searchedProduct.add(product);
+        }
+        products = searchedProduct;
+    }
     int totalProducts = products.size();
     int pageSize = (int) Math.ceil((double) totalProducts / 15);
     int page = Integer.parseInt((request.getParameter("page") == null) ? "1" : request.getParameter("page"));
@@ -129,6 +140,8 @@ protected void list(HttpServletRequest request, HttpServletResponse response)
     for (int i = startIndex; i < endIndex; i++) {
         list.add(products.get(i));
     }
+    request.setAttribute("categories", categories);
+    request.setAttribute("categoryFilter", category);
     request.setAttribute("filter", filter);
     request.setAttribute("search", search);
     request.setAttribute("list", list);

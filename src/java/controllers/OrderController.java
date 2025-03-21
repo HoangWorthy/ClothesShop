@@ -64,6 +64,9 @@ public class OrderController extends HttpServlet {
                 case "selectDetailAdmin":
                     selectDetailAdmin(request, response);
                     break;
+                case "revenue":
+                    getRevenue(request, response);
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +78,21 @@ public class OrderController extends HttpServlet {
         List<Order> orders = orderDAO.selectAll();
         request.setAttribute("orders", orders);
         request.getRequestDispatcher(Config.ADMIN).forward(request, response);
+    }
+    
+    protected void getRevenue(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        String date = request.getParameter("date");
+        double revenueIntervalDay = orderDAO.calcRevenueInterval7Days(date);
+        double revenueADay = orderDAO.calcRevenueADay(date);
+        double revenueAMonth = orderDAO.calcRevenueAMonth(date);
+        double revenueAYear = orderDAO.calcRevenueAYear(date);
+        request.setAttribute("revenueIntervalDay", revenueIntervalDay);
+        request.setAttribute("revenueADAY", revenueADay);
+        request.setAttribute("revenueAMonth", revenueAMonth);
+        request.setAttribute("revenueAYear", revenueAYear);
+        // Chua redirect di dau, design di roi coi thich redirect di dau thi redirect
+        // Da test rui a cu lay ma sai thui
     }
 
     protected void create(HttpServletRequest request, HttpServletResponse response)
@@ -205,7 +223,6 @@ public class OrderController extends HttpServlet {
             System.out.println(orderDetail.getNewTotal());
         }
         request.setAttribute("list", list);
-        System.out.println("hleoo");
         try {
             request.getRequestDispatcher("/order/ADMINlist.do").forward(request, response);
         } catch (Exception e) {
