@@ -46,7 +46,7 @@
                 <c:forEach var="product" items="${list}">
                     <div class="col">
                         <div class="card border border-secondary border-4 h-100">
-                            <img src="<c:url value="/pics/products/${product.id}.jpg" />" class="card-img-top" style="width: 100%; height: 60%;">
+                            <img src="<c:url value='/pics/products/${product.id}.jpg?v=<%= System.currentTimeMillis() %>'/>" class="card-img-top" style="width: 100%; height: 60%;">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title fw-semibold">${product.description}</h5>
                                 <h6 class="card-title text-danger fw-semibold">
@@ -54,7 +54,6 @@
                                     <fmt:formatNumber value="-${product.discount}" type="percent" />
                                 </h6>
                                 <div class="mt-auto d-grid gap-2">
-                                    <a href="" class="btn btn-secondary">View</a>
                                     <a href="<c:url value="/cart/add.do?productId=${product.id}&quantity=1"/>" class="btn btn-secondary"><i class="bi bi-cart-plus"></i></a>
                                 </div>
                             </div>

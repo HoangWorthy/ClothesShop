@@ -52,7 +52,7 @@
                             <c:if test="${account != null}">
                                 Welcome ${account.username} |
                                 <c:if test="${account.roleId.equals('AD')}">
-                                    <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/product/adminList.do"/>">Admin Dashboard</a> |
+                                    <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value="/admin/dashboard.do"/>">Admin Dashboard</a> |
                                 </c:if>
                                 <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3 pe-2" href="<c:url value="/cart/index.do" />"><i class="bi bi-cart"></i></a> | 
                                 <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3 pe-2" href="<c:url value="/account/update.do" />"  data-bs-toggle="modal" data-bs-target="#updateModal">Change Info</a> | 
@@ -90,7 +90,7 @@
 
                         <!-- Modal body -->
                         <div class="modal-body">
-                            <form action="<c:url value="/account/login.do" />">
+                            <form action="<c:url value="/account/login.do" />" method="POST">
                                 <div class="mb-3">
                                     <label class="form-label">Username</label>
                                     <input type="text" class="form-control" name="username">
@@ -123,34 +123,30 @@
 
                         <!-- Modal body -->
                         <div class="modal-body">
-                            <form action="<c:url value="/account/register.do" />">
+                            <form action="<c:url value="/account/register.do" />" method="POST">
                                 <div class="mb-3">
                                     <label class="form-label">Username</label>
-                                    <input type="text" class="form-control" name="username">
+                                    <input type="text" class="form-control" name="username" required value="${param.username}">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Password</label>
-                                    <input type="password" class="form-control" name="password">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">RoleId</label>
-                                    <input type="text" class="form-control" name="roleid">
+                                    <input type="password" class="form-control" name="password" required value="${param.password}">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Name</label>
-                                    <input type="text" class="form-control" name="name">
+                                    <input type="text" class="form-control" name="name" required value="${param.name}">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Address</label>
-                                    <input type="text" class="form-control" name="address">
+                                    <input type="text" class="form-control" name="address" required value="${param.address}">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" name="email">
+                                    <input type="email" class="form-control" name="email" required value="${param.email}">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Phone</label>
-                                    <input type="text" class="form-control" name="phone">
+                                    <input type="text" class="form-control" name="phone" required value="${param.phone}">
                                 </div>
 
                                 <i class="text-danger">${message}</i>
@@ -176,6 +172,10 @@
                         <!-- Modal Body -->
                         <div class="modal-body">
                             <form action="<c:url value='/account/update.do' />" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Old Password</label>
+                                    <input type="password" class="form-control" name="oldPassword">
+                                </div>
                                 <div class="mb-3">
                                     <label class="form-label">Password</label>
                                     <input type="password" class="form-control" name="password" value="${account.password}">
@@ -213,6 +213,14 @@
                 $(document).ready(function () {
                     var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
                     loginModal.show();
+                });
+            </script>
+        </c:if>
+        <c:if test="${not empty showRegisterModal}">
+            <script>
+                $(document).ready(function () {
+                    var registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                    registerModal.show();
                 });
             </script>
         </c:if>

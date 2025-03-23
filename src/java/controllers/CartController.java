@@ -92,20 +92,18 @@ public class CartController extends HttpServlet {
         Account account = (Account) session.getAttribute("account");
         if (account == null) {
             request.setAttribute("showLoginModal", true);
+            request.getRequestDispatcher("/product/list.do").forward(request, response);
         } else {
             String accountId = account.getUsername();
             if (cartDAO.searchOne(Integer.parseInt(productId), accountId) != 0) {
                 int quantity = cartDAO.searchOne(Integer.parseInt(productId), accountId);
                 int newQuantity = quantity + 1;
                 cartDAO.update(Integer.parseInt(productId), accountId, newQuantity);
-                System.out.println("update success");
             } else {
                 cartDAO.create(Integer.parseInt(productId), accountId);
-                System.out.println("add success");
             }
         }
-        request.setAttribute("action", "index");
-        index(request, response);
+        response.sendRedirect(request.getContextPath() + "/cart/index.do");
     }
 
     protected void update(HttpServletRequest request, HttpServletResponse response)

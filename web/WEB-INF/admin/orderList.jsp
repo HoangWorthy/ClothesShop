@@ -30,7 +30,7 @@
                 <td class="text-center">${order.date}</td>
                 <td class="text-center">${order.shipToAddress}</td>
                 <td class="text-center">
-                    <form id="status-form-${order.id}" action="<c:url value='/order/changeStatus.do'/>" method="POST">
+                    <form id="status-form-${order.id}" action="<c:url value='/admin/changeOrderStatus.do'/>" method="POST">
                         <input type="hidden" name="id" value="${order.id}">
                         <input type="hidden" name="status" id="status-input-${order.id}" value="${order.status}">
                         <div class="dropdown">
@@ -46,7 +46,7 @@
                     </form>
                 </td>
                 <td class="text-center">
-                    <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value='/order/selectDetailAdmin.do?orderHeaderId=${order.id}'/>">View</a>
+                    <a class="text-primary-emphasis link-underline link-underline-opacity-0 ms-3" href="<c:url value='/admin/orderDetail.do?orderHeaderId=${order.id}'/>">View</a>
                 </td>
             </tr>
         </c:forEach>
@@ -70,7 +70,7 @@
         <c:forEach var="detail" items="${list}" varStatus="loop">
             <tr>
                 <td>${loop.count}</td>
-                <td><img src="<c:url value="/pics/products/${detail.productId.id}.jpg" />" height="80px" /></td>
+                <td><img src="<c:url value='/pics/products/${detail.productId.id}.jpg?v=<%= System.currentTimeMillis() %>'/>" height="80px" /></td>
                 <td>${detail.productId.description}</td>
                 <td class="text-center"><fmt:formatNumber value="${detail.newPrice}" type="currency" /></td>
                 <td class="text-center">${detail.quantity}</td>

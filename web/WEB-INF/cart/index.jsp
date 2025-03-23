@@ -24,7 +24,7 @@
         <c:forEach var="item" items="${carts}" varStatus="loop" >
             <tr>
                 <td>${loop.count}</td>
-                <td><img src="<c:url value="/pics/products/${item.productId}.jpg" />" height="80px" /></td>
+                <td><img src="<c:url value='/pics/products/${item.productId}.jpg?v=<%= System.currentTimeMillis() %>'/>" height="80px" /></td>
                 <td>${item.product.description}</td>
 
                 <td class="text-center">
@@ -63,8 +63,8 @@
         <tr>
             <th>No.</th>
             <th>Address</th>
-            <th class="text-center">date</th>
-            <th class="text-center">status</th>
+            <th class="text-center">Date</th>
+            <th class="text-center">Status</th>
             <th class="text-center">Actions</th>
 
         </tr>
@@ -103,7 +103,7 @@
             <c:forEach var="detail" items="${list}" varStatus="loop">
                 <tr>
                     <td>${loop.count}</td>
-                    <td><img src="<c:url value="/pics/products/${detail.productId.id}.jpg" />" height="80px" /></td>
+                    <td><img src="<c:url value='/pics/products/${detail.product.id}.jpg?v=<%= System.currentTimeMillis() %>'/>" height="80px" /></td>
                     <td>${detail.productId.description}</td>
                     <td class="text-center"><fmt:formatNumber value="${detail.newPrice}" type="currency" /></td>
                     <td class="text-center">${detail.quantity}</td>

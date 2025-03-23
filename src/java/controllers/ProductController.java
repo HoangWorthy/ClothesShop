@@ -67,35 +67,10 @@ public class ProductController extends HttpServlet {
         try {
             switch (action) {
                 case "list":
-                    //hiện danh sach toy
                     list(request, response);
                     break;
                 case "index":
                     index(request, response);
-                    break;
-                case "update":
-                    update(request, response);
-                    break;
-                case "delete":
-                    delete(request, response);
-                    break;
-                case "add":
-                    add(request, response);
-                    break;
-                case "adminList":
-                    select(request, response);
-                    break;
-                case "userList":
-                    selectUser(request, response);
-                    break;
-                case "productList":
-                    selectProduct(request, response);
-                    break;
-                case "addPicture":
-                    addPicture(request, response);
-                    break;
-                case "active":
-                    active(request, response);
                     break;
             }
         } catch (Exception e) {

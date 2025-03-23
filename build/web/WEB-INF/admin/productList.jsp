@@ -1,9 +1,3 @@
-<%-- 
-    Document   : products
-    Created on : Mar 9, 2025, 8:33:14 PM
-    Author     : Nguyen Anh Khoi
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -11,7 +5,7 @@
 <table class="table table-secondary">
     <div class="d-flex">
         <h5 class="me-4">Products</h5>
-        <a class="text-success-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/product/add.do"/>" data-bs-toggle="modal" data-bs-target="#addProductModal">Create</a>
+        <a class="text-success-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/admin/addProduct.do"/>" data-bs-toggle="modal" data-bs-target="#addProductModal">Create</a>
 
     </div>
     <tr>
@@ -27,7 +21,7 @@
     <c:forEach var="product" items="${products}" varStatus="loop">
         <tr>
             <td class="text-center">${loop.count}</td>
-            <td class="text-center"><img src="<c:url value='/pics/products/${product.id}.jpg' />" height="80px" /></td>
+            <td class="text-center"><img src="<c:url value='/pics/products/${product.id}.jpg?v=<%= System.currentTimeMillis() %>'/>" height="80px" /></td>
             <td class="text-center">${product.description}</td>
             <td class="text-center">
                 <fmt:formatNumber value="${product.price}" type="currency" />
@@ -44,7 +38,7 @@
             <td class="text-center">
                 <!-- Add product details as data attributes -->
                 <a class="text-secondary-emphasis link-underline link-underline-opacity-0 ms-3"
-                   href="<c:url value="/product/update.do" />" 
+                   href="<c:url value="/admin/updateProduct.do" />" 
                    data-bs-toggle="modal" 
                    data-bs-target="#updateProductModal"
                    data-id="${product.id}"
@@ -57,9 +51,9 @@
                    onclick="populateModal(this)">Edit
                 </a>
                 <a class="text-danger link-underline link-underline-opacity-0 ms-3" 
-                   href="<c:url value='/product/${product.status==true ? "delete":"active"}.do?id=${product.id}'/>"
-                   onclick="return confirm('Are you sure you want to ${product.status==true ? "deactivate":"activate"} this product?');">
-                    ${product.status==true ? "Deactivate":"Activate"}
+                   href="<c:url value='/admin/${product.status==true ? "deleteProduct":"activeProduct"}.do?id=${product.id}'/>"
+                   onclick="return confirm('Are you sure you want to ${product.status==true ? "deactive":"active"} this product?');">
+                    ${product.status==true ? "Deactive":"Active"}
                 </a>
             </td>
         </tr>
@@ -79,7 +73,7 @@
 
             <!-- Modal Body -->
             <div class="modal-body">
-                <form action="<c:url value='/product/update.do' />" method="POST">
+                <form action="<c:url value='/admin/updateProduct.do' />" method="POST">
                     <input type="hidden" id="modal-product-id" name="id">
                     <input type="hidden" id="modal-status" name="status">
 
@@ -128,7 +122,7 @@
 
             <!-- Modal Body -->
             <div class="modal-body">
-                <form action="<c:url value='/product/add.do' />" method="POST">
+                <form action="<c:url value='/admin/addProduct.do' />" method="POST">
 
                     <div class="mb-3">
                         <label class="form-label">Description</label>
@@ -140,7 +134,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Discount</label>
-                        <input type="number" id="modal-discount" class="form-control" name="discount" required>
+                        <input type="number" step="0.1"id="modal-discount" class="form-control" name="discount" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Category</label>
@@ -173,7 +167,7 @@
 
             <!-- Modal Body -->
             <div class="modal-body">
-                <form action="<c:url value='/product/addPicture.do' />" method="POST" enctype="multipart/form-data">
+                <form action="<c:url value='/admin/addProductPicture.do' />" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label class="form-label">Product Picture</label>
                         <input type="file" id="modal-category" class="form-control" name="picture" required>

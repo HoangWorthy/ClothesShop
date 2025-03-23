@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +42,6 @@ public class AccountController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String action = (String) request.getAttribute("action");
-        System.out.println(action);
         try {
             switch (action) {
                 case "login":
@@ -76,7 +76,7 @@ public class AccountController extends HttpServlet {
         HttpSession session = request.getSession();
         session.setAttribute("account", account);
         if (account.getRoleId().equals("AD")) {
-            request.getRequestDispatcher("/product/adminList.do").forward(request, response);
+            request.getRequestDispatcher("/admin/dashboard.do").forward(request, response);
         } else {
             request.setAttribute("action", "index");
             request.setAttribute("controller", "product");
@@ -88,26 +88,34 @@ public class AccountController extends HttpServlet {
             throws ServletException, IOException, SQLException {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        String password = request.getParameter("password");
-        String name = request.getParameter("name");
-        String address = request.getParameter("address");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        Account newAccount = new Account();
-        newAccount.setUsername(account.getUsername());
-        newAccount.setRoleId(account.getRoleId());
-        newAccount.setPassword(password);
-        newAccount.setName(name);
-        newAccount.setAddress(address);
-        newAccount.setEmail(email);
-        newAccount.setPhone(phone);
-        accountDAO.update(account.getUsername(), newAccount);
-        session.setAttribute("account", newAccount);
-        request.setAttribute("message", "Update Success");
+        String oldPassword = request.getParameter("oldPassword");
+        System.out.println(oldPassword);
+        System.out.println(account.getPassword());
+        if(oldPassword.equals(account.getPassword().trim())){
+            System.out.println("OK");
+            String password = request.getParameter("password");
+            String name = request.getParameter("name");
+            String address = request.getParameter("address");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            Account newAccount = new Account();
+            newAccount.setUsername(account.getUsername());
+            newAccount.setRoleId(account.getRoleId());
+            newAccount.setPassword(password);
+            newAccount.setName(name);
+            newAccount.setAddress(address);
+            newAccount.setEmail(email);
+            newAccount.setPhone(phone);
+            String message = utils.Util.validateAccount(newAccount);
+            if(message.equals("Valid")){
+                accountDAO.update(account.getUsername(), newAccount);
+                message = "Account updated successfully";
+            }
+            session.setAttribute("account", newAccount);
+            request.setAttribute("message", message);
+        } else request.setAttribute("message", "Wrong password");
         request.setAttribute("showUpdateModal", true);
-        request.setAttribute("controller", "product");
-        request.setAttribute("action", "index");
-        request.getRequestDispatcher("/product").forward(request, response);
+        request.getRequestDispatcher("/product/index.do").forward(request, response);
     }
 
     protected void logout(HttpServletRequest request, HttpServletResponse response)
@@ -123,7 +131,6 @@ public class AccountController extends HttpServlet {
             throws ServletException, IOException, SQLException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String roleId = request.getParameter("roleId");
         String name = request.getParameter("name");
         String address = request.getParameter("address");
         String email = request.getParameter("email");
@@ -132,19 +139,21 @@ public class AccountController extends HttpServlet {
         Account account = new Account();
         account.setUsername(username);
         account.setPassword(password);
-        account.setRoleId(roleId);
+        account.setRoleId("US");
         account.setName(name);
         account.setAddress(address);
         account.setEmail(email);
         account.setPhone(phone);
-        accountDAO.create(account);
-        HttpSession session = request.getSession();
-        session.setAttribute("account", account);
-//        request.setAttribute("message", "Register Success");
-//        request.setAttribute("showRegisterModal", true);
-        request.setAttribute("controller", "product");
-        request.setAttribute("action", "index");
-        request.getRequestDispatcher("/product").forward(request, response);
+        String message = utils.Util.validateAccount(account);
+        if(message.equals("Valid")){
+            message = "Account registered successfully";
+            accountDAO.create(account);
+            HttpSession session = request.getSession();
+            session.setAttribute("account", account);
+        }
+        request.setAttribute("message", message);
+        request.setAttribute("showRegisterModal", true);
+        request.getRequestDispatcher("/product/index.do").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

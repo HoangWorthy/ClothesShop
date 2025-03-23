@@ -99,7 +99,7 @@
 </div>
 <br>
 <div class="container text-center mt-4 fw-bold mb-2">
-    <form action="<c:url value='/order/revenue.do'/>">
+    <form action="<c:url value='/admin/revenue.do'/>">
         <input type="date" class="form-control" name="date" value="<%= selectedDate%>" onchange="this.form.submit()">
     </form>
 </div>
@@ -134,7 +134,7 @@
 <table class="table table-secondary mb-5">
     <div class="d-flex">
         <h5 class=" me-4">Users</h5>
-        <a class="text-primary-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/product/userList.do"/>">View All</a>
+        <a class="text-primary-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/admin/productList.do"/>">View All</a>
     </div>
     <tr>
         <th>No.</th>
@@ -163,7 +163,7 @@
 <table class="table table-secondary">
     <div class="d-flex">
         <h5 class=" me-4">Products</h5>
-        <a class="text-primary-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/product/productList.do"/>">View All</a>
+        <a class="text-primary-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/admin/productList.do"/>">View All</a>
     </div>
     <tr>
         <th>No.</th>
@@ -193,8 +193,8 @@
 
 <table class="table table-secondary mb-5">
     <div class="d-flex">
-        <h5 class=" me-4">Carts</h5>
-        <a class="text-primary-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/order/ADMINlist.do"/>">View All</a>
+        <h5 class=" me-4">Orders</h5>
+        <a class="text-primary-emphasis link-dark link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover" href="<c:url value="/admin/orderList.do"/>">View All</a>
     </div>
     <tr>
         <th>No.</th>

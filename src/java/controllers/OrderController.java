@@ -50,26 +50,14 @@ public class OrderController extends HttpServlet {
         String action = (String) request.getAttribute("action");
         try {
             switch (action) {
-                case "ADMINlist":
-                    selectAll(request, response);
-                    break;
-                case "create":
-                    create(request, response);
-                    break;
-                case "changeStatus":
-                    changeStatus(request, response);
-                    break;
                 case "select":
                     select(request, response);
                     break;
                 case "selectDetail":
                     selectDetail(request, response);
                     break;
-                case "selectDetailAdmin":
-                    selectDetailAdmin(request, response);
-                    break;
-                case "revenue":
-                    getRevenue(request, response);
+                case "create":
+                    create(request, response);
                     break;
             }
         } catch (Exception e) {
